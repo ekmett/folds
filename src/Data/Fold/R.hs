@@ -26,6 +26,8 @@ data R b a = forall r. R (r -> a) (b -> r -> r) r
 instance Folding R where
   enfold t (R k h z)     = k (foldr h z t)
   enfoldOf l s (R k h z) = k (foldrOf l h z s)
+  enfold' t (R k h z)     = k (foldr' h z t)
+  enfoldOf' l s (R k h z) = k (foldrOf' l h z s)
 
 instance Profunctor R where
   dimap f g (R k h z) = R (g.k) (h.f) z

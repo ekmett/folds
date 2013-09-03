@@ -63,9 +63,7 @@ library
   exposed-modules:
     Data.Fold.Class
     Data.Fold.L
-    Data.Fold.L'
     Data.Fold.R
-    Data.Fold.R'
     Data.Fold.Reducer
     Data.Fold.Seq
 

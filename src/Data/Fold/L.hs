@@ -24,8 +24,10 @@ import Prelude hiding (foldl)
 data L b a = forall r. L (r -> a) (r -> b -> r) r
 
 instance Folding L where
-  enfold t (L k h z)     = k (foldl h z t)
-  enfoldOf l s (L k h z) = k (foldlOf l h z s)
+  enfold t (L k h z)      = k (foldl h z t)
+  enfoldOf l s (L k h z)  = k (foldlOf l h z s)
+  enfold' t (L k h z)     = k (foldl' h z t)
+  enfoldOf' l s (L k h z) = k (foldlOf' l h z s)
 
 instance Profunctor L where
   dimap f g (L k h z) = L (g.k) (\r -> h r . f) z
