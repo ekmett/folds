@@ -20,5 +20,16 @@
 <a name="line-11"></a>  <span class='hs-varid'>enfold</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>enfoldOf</span> <span class='hs-varid'>folded</span>
 <a name="line-12"></a>
 <a name="line-13"></a>  <span class='hs-varid'>enfoldOf</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Fold</span> <span class='hs-varid'>s</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>a</span>
+<a name="line-14"></a>
+<a name="line-15"></a>  <span class='hs-varid'>enfold'</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Foldable</span> <span class='hs-varid'>t</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-varid'>t</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>a</span>
+<a name="line-16"></a>  <span class='hs-varid'>enfold'</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>enfoldOf'</span> <span class='hs-varid'>folded</span>
+<a name="line-17"></a>
+<a name="line-18"></a>  <span class='hs-varid'>enfoldOf'</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Fold</span> <span class='hs-varid'>s</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>a</span>
+<a name="line-19"></a>  <span class='hs-varid'>enfoldOf'</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>enfoldOf</span>
+<a name="line-20"></a>
+<a name="line-21"></a>  <span class='hs-varid'>enscan</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Traversable</span> <span class='hs-varid'>t</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-varid'>t</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>t</span> <span class='hs-varid'>a</span>
+<a name="line-22"></a>  <span class='hs-varid'>enscan</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>enscanOf</span> <span class='hs-varid'>traverse</span>
+<a name="line-23"></a>
+<a name="line-24"></a>  <span class='hs-varid'>enscanOf</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Traversal</span> <span class='hs-varid'>s</span> <span class='hs-varid'>t</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>t</span>
 </pre></body>
 </html>
