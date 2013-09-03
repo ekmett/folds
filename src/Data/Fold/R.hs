@@ -28,6 +28,9 @@ instance Folding R where
   enfoldOf l s (R k h z) = k (foldrOf l h z s)
   enfold' t (R k h z)     = k (foldr' h z t)
   enfoldOf' l s (R k h z) = k (foldrOf' l h z s)
+  enscanOf l s (R k h z) = snd (mapAccumROf l h' z s) where
+    h' r a = (r', k r') where r' = h a r
+
 
 instance Profunctor R where
   dimap f g (R k h z) = R (g.k) (h.f) z

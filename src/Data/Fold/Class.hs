@@ -17,3 +17,8 @@ class Choice p => Folding p where
 
   enfoldOf' :: Fold s b -> s -> p b a -> a
   enfoldOf' = enfoldOf
+
+  enscan :: Traversable t => t b -> p b a -> t a
+  enscan = enscanOf traverse
+
+  enscanOf :: Traversal s t b a -> s -> p b a -> t
