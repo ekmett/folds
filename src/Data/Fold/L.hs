@@ -20,7 +20,7 @@ import Data.Profunctor.Unsafe
 import Unsafe.Coerce
 import Prelude hiding (foldl)
 
--- right folds
+-- left folds
 data L b a = forall r. L (r -> a) (r -> b -> r) r
 
 instance Folding L where
