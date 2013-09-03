@@ -7,18 +7,12 @@
 {-# LANGUAGE ExistentialQuantification #-}
 module Data.Fold.Reducer
   ( Reducer(..)
-  , reduce
-  -- * Common reducers
-  , reducer
-  , monoid
-  , sum
-  , product
-  , length
   ) where
 
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
+import Data.Fold.Class
 import Data.Foldable hiding (sum, product)
 import Data.Functor.Extend
 import Data.Functor.Apply
@@ -41,13 +35,11 @@ instance Reifies s (a -> a -> a, a) => Monoid (M a s) where
   mappend (M a) (M b) = M $ fst (reflect (Proxy :: Proxy s)) a b
   {-# INLINE mappend #-}
 
-reduce :: Foldable t => t b -> Reducer b a -> a
-reduce tb (Reducer k h m (e :: m)) = reify (m,e) $
-  \ (_ :: Proxy s) -> k $ runM (foldMap (M #. h) tb :: M m s)
-
-reduceOf :: Fold s b -> s -> Reducer b a -> a
-reduceOf l s (Reducer k h m (e :: m)) = reify (m,e) $
-  \ (_ :: Proxy s) -> k $ runM (foldMapOf l (M #. h) s :: M m s)
+instance Folding Reducer where
+  enfold tb (Reducer k h m (e :: m)) = reify (m,e) $
+    \ (_ :: Proxy s) -> k $ runM (foldMap (M #. h) tb :: M m s)
+  enfoldOf l s (Reducer k h m (e :: m)) = reify (m,e) $
+    \ (_ :: Proxy s) -> k $ runM (foldMapOf l (M #. h) s :: M m s)
 
 instance Profunctor Reducer where
   dimap f g (Reducer k h m e) = Reducer (g.k) (h.f) m e
@@ -136,29 +128,3 @@ instance ComonadApply (Reducer b) where
 
   _ @> m = m
   {-# INLINE (@>) #-}
-
--- * Common reducers
-
-reducer :: (m -> m -> m) -> m -> Reducer m m
-reducer = Reducer id id
-{-# INLINE reducer #-}
-
-monoid :: Monoid m => Reducer m m
-monoid = reducer mappend mempty
-{-# INLINE monoid #-}
-
-sum :: Num a => Reducer a a
-sum = reducer (+) 0
-{-# INLINE sum #-}
-
-product :: Num a => Reducer a a
-product = reducer (*) 1
-{-# INLINE product #-}
-
-length :: Reducer a Int
-length = Reducer id (\_ -> 1) (+) 0
-{-# INLINE length #-}
-
-genericLength :: Num a => Reducer b a
-genericLength = Reducer id (\_ -> 1) (+) 0
-{-# INLINE genericLength #-}

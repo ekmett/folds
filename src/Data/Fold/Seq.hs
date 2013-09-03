@@ -2,7 +2,7 @@
 {-# LANGUAGE ExistentialQuantification #-}
 module Data.Fold.Seq
   ( Seq(..)
-  , sequenced
+  , enfolds
   , Tree(..)
   , tree
   ) where
@@ -132,8 +132,8 @@ tree = Seq id Bin Tip
 {-# INLINE tree #-}
 
 -- | apply a sequence algebra
-sequenced :: Tree b -> Seq b a -> a
-sequenced t0 (Seq k h x) = k (go t0) where
+enfolds :: Tree b -> Seq b a -> a
+enfolds t (Seq k h x) = k (go t) where
   go Tip = x
   go (Bin l a r) = h (go l) a (go r)
-{-# INLINE sequenced #-}
+{-# INLINE enfolds #-}
