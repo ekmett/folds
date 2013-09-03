@@ -59,6 +59,7 @@ library
   hs-source-dirs: src
 
   exposed-modules:
+    Data.Fold
     Data.Fold.Class
     Data.Fold.L
     Data.Fold.R
