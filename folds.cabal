@@ -11,7 +11,7 @@ homepage:      http://github.com/ekmett/folds
 bug-reports:   http://github.com/ekmett/folds/issues
 copyright:     Copyright (C) 2013 Edward A. Kmett
 build-type:    Custom
-synopsis:      A playground of folds linear algebra primitives using Morton ordering
+synopsis:      A playground full of comonadic folds.
 
 extra-source-files:
   .ghci
@@ -22,11 +22,11 @@ extra-source-files:
   README.markdown
 
 description:
-  A playground of folds linear algebra primitives using Morton ordering
+  A playground full of comonadic folds.
   .
-  The design of this library is described in the series \"Revisiting Matrix Multiplication\" on FP Complete's School of Haskell.
+  This style of fold is documented in
   .
-  <https://www.fpcomplete.com/user/edwardk/revisiting-matrix-multiplication/>
+  <https://www.fpcomplete.com/user/edwardk/cellular-automata/part-2>
 
 source-repository head
   type: git
