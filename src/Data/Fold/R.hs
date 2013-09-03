@@ -16,11 +16,7 @@ import Data.Foldable hiding (sum, product)
 import Data.Fold.Class
 import Data.Functor.Extend
 import Data.Functor.Apply
-import Data.Monoid
-import Data.Profunctor
 import Data.Profunctor.Unsafe
-import Data.Proxy
-import Data.Reflection
 import Unsafe.Coerce
 import Prelude hiding (foldr, sum, product, length)
 
