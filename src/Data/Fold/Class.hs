@@ -5,7 +5,6 @@ module Data.Fold.Class
 
 import Control.Lens
 import Data.Foldable
-import Data.Profunctor
 
 class Choice p => Folding p where
   enfold :: Foldable t => t b -> p b a -> a
