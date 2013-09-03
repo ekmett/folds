@@ -14,20 +14,18 @@ import Data.Foldable
 import Data.Functor.Extend
 import Data.Functor.Apply
 import Data.Monoid
-import Data.Profunctor
 import Data.Profunctor.Unsafe
-import Data.Traversable
 import Unsafe.Coerce
 
 -- | A sequence algebra
 data Seq b a = forall x. Seq (x -> a) (x -> b -> x -> x) x
 
 instance Profunctor Seq where
-  dimap f g (Seq xb h x) = Seq (g.xb) (\x a -> h x (f a)) x
+  dimap f g (Seq xb h z) = Seq (g.xb) (\x a -> h x (f a)) z
   {-# INLINE dimap #-}
-  rmap g (Seq xb h x) = Seq (g.xb) h x
+  rmap g (Seq xb h z) = Seq (g.xb) h z
   {-# INLINE rmap #-}
-  lmap f (Seq xb h x) = Seq xb (\x a -> h x (f a)) x
+  lmap f (Seq xb h z) = Seq xb (\x a -> h x (f a)) z
   {-# INLINE lmap #-}
   (#.) _ = unsafeCoerce
   {-# INLINE (#.) #-}
@@ -35,14 +33,14 @@ instance Profunctor Seq where
   {-# INLINE (.#) #-}
 
 instance Choice Seq where
-  left' (Seq k h x) = Seq (_Left %~ k) step (Left x) where
+  left' (Seq k h z) = Seq (_Left %~ k) step (Left z) where
     step (Left x) (Left a) (Left y) = Left (h x a y)
     step (Right c) _ _ = Right c
     step _ (Right c) _ = Right c
     step _ _ (Right c) = Right c
   {-# INLINE left' #-}
 
-  right' (Seq k h x) = Seq (_Right %~ k) step (Right x) where
+  right' (Seq k h z) = Seq (_Right %~ k) step (Right z) where
     step (Right x) (Right a) (Right y) = Right (h x a y)
     step (Left c) _ _ = Left c
     step _ (Left c) _ = Left c
@@ -70,10 +68,10 @@ instance Applicative (Seq b) where
   pure b = Seq (\() -> b) (\() _ () -> ()) ()
   {-# INLINE pure #-}
 
-  Seq xf xm x <*> Seq ya ym y = Seq
+  Seq xf xm xz <*> Seq ya ym yz = Seq
     (\(Pair x y) -> xf x $ ya y)
     (\(Pair x1 y1) b (Pair x2 y2) -> Pair (xm x1 b x2) (ym y1 b y2))
-    (Pair x y)
+    (Pair xz yz)
   {-# INLINE (<*>) #-}
   (<*) m = \_ -> m
   {-# INLINE (<*) #-}
