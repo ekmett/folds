@@ -17,7 +17,6 @@ import Data.Foldable hiding (sum, product)
 import Data.Functor.Extend
 import Data.Functor.Apply
 import Data.Monoid
-import Data.Profunctor
 import Data.Profunctor.Unsafe
 import Data.Proxy
 import Data.Reflection
@@ -54,20 +53,20 @@ instance Profunctor Reducer where
   {-# INLINE (.#) #-}
 
 instance Choice Reducer where
-  left' (Reducer k h m x) = Reducer (_Left %~ k) (_Left %~ h) step (Left x) where
+  left' (Reducer k h m z) = Reducer (_Left %~ k) (_Left %~ h) step (Left z) where
     step (Left x) (Left y) = Left (m x y)
     step (Right c) _ = Right c
     step _ (Right c) = Right c
   {-# INLINE left' #-}
 
-  right' (Reducer k h m x) = Reducer (_Right %~ k) (_Right %~ h) step (Right x) where
+  right' (Reducer k h m z) = Reducer (_Right %~ k) (_Right %~ h) step (Right z) where
     step (Right x) (Right y) = Right (m x y)
     step (Left c) _ = Left c
     step _ (Left c) = Left c
   {-# INLINE right' #-}
 
 instance Functor (Reducer a) where
-  fmap f (Reducer k h m x) = Reducer (f.k) h m x
+  fmap f (Reducer k h m z) = Reducer (f.k) h m z
   {-# INLINE fmap #-}
 
   (<$) b = \_ -> pure b
@@ -89,11 +88,11 @@ instance Applicative (Reducer b) where
   pure b = Reducer (\() -> b) (\_ -> ()) (\() () -> ()) ()
   {-# INLINE pure #-}
 
-  Reducer xf bx xx x <*> Reducer ya by yy y = Reducer
+  Reducer xf bx xx xz <*> Reducer ya by yy yz = Reducer
     (\(Pair x y) -> xf x $ ya y)
     (\b -> Pair (bx b) (by b))
     (\(Pair x1 y1) (Pair x2 y2) -> Pair (xx x1 x2) (yy y1 y2))
-    (Pair x y)
+    (Pair xz yz)
   {-# INLINE (<*>) #-}
 
   (<*) m = \_ -> m
