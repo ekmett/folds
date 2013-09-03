@@ -17,6 +17,7 @@ import Data.Fold.Class
 import Data.Functor.Extend
 import Data.Functor.Apply
 import Data.Profunctor.Unsafe
+import Data.Traversable
 import Unsafe.Coerce
 import Prelude hiding (foldr, sum, product, length)
 
@@ -28,6 +29,8 @@ instance Folding R where
   enfoldOf l s (R k h z) = k (foldrOf l h z s)
   enfold' t (R k h z)     = k (foldr' h z t)
   enfoldOf' l s (R k h z) = k (foldrOf' l h z s)
+  enscan s (R k h z) = snd (mapAccumR h' z s) where
+    h' r a = (r', k r') where r' = h a r
   enscanOf l s (R k h z) = snd (mapAccumROf l h' z s) where
     h' r a = (r', k r') where r' = h a r
 

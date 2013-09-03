@@ -20,6 +20,7 @@ import Data.Monoid
 import Data.Profunctor.Unsafe
 import Data.Proxy
 import Data.Reflection
+import Data.Traversable
 import Unsafe.Coerce
 import Prelude hiding (sum, product, length)
 
@@ -37,8 +38,15 @@ instance Reifies s (a -> a -> a, a) => Monoid (M a s) where
 instance Folding Reducer where
   enfold tb (Reducer k h m (e :: m)) = reify (m,e) $
     \ (_ :: Proxy s) -> k $ runM (foldMap (M #. h) tb :: M m s)
+
   enfoldOf l s (Reducer k h m (e :: m)) = reify (m,e) $
     \ (_ :: Proxy s) -> k $ runM (foldMapOf l (M #. h) s :: M m s)
+
+  enscan s (Reducer k h m z) = snd (mapAccumL h' z s) where
+    h' r a = (r', k r') where r' = m r (h a)
+
+  enscanOf l s (Reducer k h m z) = snd (mapAccumLOf l h' z s) where
+    h' r a = (r', k r') where r' = m r (h a)
 
 instance Profunctor Reducer where
   dimap f g (Reducer k h m e) = Reducer (g.k) (h.f) m e
