@@ -3,6 +3,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE ExistentialQuantification #-}
 module Data.Fold.Reducer
   ( Reducer(..)
@@ -18,7 +19,7 @@ module Data.Fold.Reducer
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
-import Data.Foldable
+import Data.Foldable hiding (sum, product)
 import Data.Functor.Extend
 import Data.Functor.Apply
 import Data.Monoid
@@ -27,6 +28,7 @@ import Data.Profunctor.Unsafe
 import Data.Proxy
 import Data.Reflection
 import Unsafe.Coerce
+import Prelude hiding (sum, product, length)
 
 -- sequence algebras
 data Reducer b a = forall m. Reducer (m -> a) (b -> m) (m -> m -> m) m
@@ -42,6 +44,10 @@ instance Reifies s (a -> a -> a, a) => Monoid (M a s) where
 reduce :: Foldable t => t b -> Reducer b a -> a
 reduce tb (Reducer k h m (e :: m)) = reify (m,e) $
   \ (_ :: Proxy s) -> k $ runM (foldMap (M #. h) tb :: M m s)
+
+reduceOf :: Fold s b -> s -> Reducer b a -> a
+reduceOf l s (Reducer k h m (e :: m)) = reify (m,e) $
+  \ (_ :: Proxy s) -> k $ runM (foldMapOf l (M #. h) s :: M m s)
 
 instance Profunctor Reducer where
   dimap f g (Reducer k h m e) = Reducer (g.k) (h.f) m e
@@ -150,9 +156,9 @@ product = reducer (*) 1
 {-# INLINE product #-}
 
 length :: Reducer a Int
-length = reducer (\_ n -> n + 1) 1
+length = Reducer id (\_ -> 1) (+) 0
 {-# INLINE length #-}
 
 genericLength :: Num a => Reducer b a
-genericLength = reducer (\_ n -> n + 1) 1
+genericLength = Reducer id (\_ -> 1) (+) 0
 {-# INLINE genericLength #-}
