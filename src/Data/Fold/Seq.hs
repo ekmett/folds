@@ -1,20 +1,25 @@
 {-# LANGUAGE Trustworthy #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE ExistentialQuantification #-}
 module Data.Fold.Seq
   ( Seq(..)
+  , sequenced
+  , Tree(..)
+  , tree
   ) where
 
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
+import Data.Foldable
 import Data.Functor.Extend
 import Data.Functor.Apply
+import Data.Monoid
 import Data.Profunctor
 import Data.Profunctor.Unsafe
+import Data.Traversable
 import Unsafe.Coerce
 
--- sequence algebras
+-- | A sequence algebra
 data Seq b a = forall x. Seq (x -> a) (x -> b -> x -> x) x
 
 instance Profunctor Seq where
@@ -97,3 +102,38 @@ instance ComonadApply (Seq b) where
   {-# INLINE (<@) #-}
   _ @> m = m
   {-# INLINE (@>) #-}
+
+-- | The carrier for the initial sequence algebra
+data Tree a
+  = Tip
+  | Bin (Tree a) a (Tree a)
+
+instance Functor Tree where
+  fmap f t0 = go t0 where
+    go Tip = Tip
+    go (Bin l a r) = Bin (go l) (f a) (go r)
+  {-# INLINE fmap #-}
+
+instance Foldable Tree where
+  foldMap f t0 = go t0 where
+    go Tip = mempty
+    go (Bin l a r) = go l `mappend` f a `mappend` go r
+  {-# INLINE foldMap #-}
+
+instance Traversable Tree where
+  traverse f t0 = go t0 where
+    go Tip = pure Tip
+    go (Bin l a r) = Bin <$> go l <*> f a <*> go r
+  {-# INLINE traverse #-}
+
+-- | the initial sequence algebra
+tree :: Seq a (Tree a)
+tree = Seq id Bin Tip
+{-# INLINE tree #-}
+
+-- | apply a sequence algebra
+sequenced :: Tree b -> Seq b a -> a
+sequenced t0 (Seq k h x) = k (go t0) where
+  go Tip = x
+  go (Bin l a r) = h (go l) a (go r)
+{-# INLINE sequenced #-}
