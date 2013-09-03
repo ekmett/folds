@@ -24,9 +24,7 @@ extra-source-files:
 description:
   A playground full of comonadic folds.
   .
-  This style of fold is documented in
-  .
-  <https://www.fpcomplete.com/user/edwardk/cellular-automata/part-2>
+  This style of fold is documented in <https://www.fpcomplete.com/user/edwardk/cellular-automata/part-2 "Cellular Automata, Part II: PNGs and Moore">
 
 source-repository head
   type: git
