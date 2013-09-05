@@ -64,7 +64,6 @@ library
     Data.Fold.L
     Data.Fold.R
     Data.Fold.Reducer
-    Data.Fold.Seq
 
   ghc-options: -Wall
 
