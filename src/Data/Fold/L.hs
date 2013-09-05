@@ -24,15 +24,20 @@ import Prelude hiding (foldl)
 data L b a = forall r. L (r -> a) (r -> b -> r) r
 
 instance Folding L where
-  enfold t (L k h z)      = k (foldl h z t)
-  enfoldOf l s (L k h z)  = k (foldlOf l h z s)
-  enfold' t (L k h z)     = k (foldl' h z t)
-  enfoldOf' l s (L k h z) = k (foldlOf' l h z s)
-  enscan s (L k h z) = snd (mapAccumL h' z s) where
-    h' r a = (r', k r') where r' = h r a
-  enscanOf l s (L k h z) = snd (mapAccumLOf l h' z s) where
-    h' r a = (r', k r') where r' = h r a
+  run t (L k h z)     = k (foldl h z t)
+  runOf l s (L k h z) = k (foldlOf l h z s)
+  prefix s            = run s . duplicate
+  prefixOf l s        = runOf l s . duplicate
+  postfix t s         = extend (run s) t
+  postfixOf l t s     = extend (runOf l s) t
 
+{-
+enscanl s (L k h z) = snd (mapAccumL h' z s) where
+  h' r a = (r', k r') where r' = h r a
+
+enscanlOf l s (L k h z) = snd (mapAccumLOf l h' z s) where
+  h' r a = (r', k r') where r' = h r a
+-}
 
 instance Profunctor L where
   dimap f g (L k h z) = L (g.k) (\r -> h r . f) z

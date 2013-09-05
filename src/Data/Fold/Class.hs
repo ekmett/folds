@@ -15,21 +15,19 @@ import Data.Profunctor.Unsafe
 -- >>> import Data.Fold
 
 class Choice p => Folding p where
-  enfold :: Foldable t => t a -> p a b -> b
-  enfold = enfoldOf folded
+  prefix :: Foldable t => t a -> p a b -> p a b
+  prefix = prefixOf folded
+  prefixOf :: Fold s a -> s -> p a b -> p a b
 
-  enfoldOf :: Fold s a -> s -> p a b -> b
+  postfix :: Foldable t => p a b -> t a -> p a b
+  postfix = postfixOf folded
+  postfixOf :: Fold s a -> p a b -> s -> p a b
 
-  enfold' :: Foldable t => t a -> p a b -> b
-  enfold' = enfoldOf' folded
+  run :: Foldable t => t a -> p a b -> b
+  run = runOf folded
+  runOf :: Fold s a -> s -> p a b -> b
 
-  enfoldOf' :: Fold s a -> s -> p a b -> b
-  enfoldOf' = enfoldOf
-
-  enscan :: Traversable t => t a -> p a b -> t b
-  enscan = enscanOf traverse
-
-  enscanOf :: Traversal s t a b -> s -> p a b -> t
+-- enscanOf :: Traversal s t a b -> s -> p a b -> t
 
 -- | Lift a 'Folding' into a 'Prism'.
 --
@@ -39,10 +37,10 @@ class Choice p => Folding p where
 -- result of accumulating rewrapped in the 'Prism' if
 -- everything matches.
 --
--- >>> enfold [Left 1, Left 2, Left 3] $ within _Left $ R id (+) 0
+-- >>> run [Left 1, Left 2, Left 3] $ within _Left $ R id (+) 0
 -- Left 6
 --
--- >>> enfold [Left 1, Right 2, Right 3] $ within _Left $ R id (+) 0
+-- >>> run [Left 1, Right 2, Right 3] $ within _Left $ R id (+) 0
 -- Right 2
 --
 -- @

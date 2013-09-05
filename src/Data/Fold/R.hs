@@ -16,7 +16,7 @@ import Data.Fold.Class
 import Data.Functor.Extend
 import Data.Functor.Apply
 import Data.Profunctor.Unsafe
-import Data.Traversable
+-- import Data.Traversable
 import Unsafe.Coerce
 import Prelude hiding (foldr, sum, product, length)
 
@@ -24,15 +24,12 @@ import Prelude hiding (foldr, sum, product, length)
 data R b a = forall r. R (r -> a) (b -> r -> r) r
 
 instance Folding R where
-  enfold t (R k h z)     = k (foldr h z t)
-  enfoldOf l s (R k h z) = k (foldrOf l h z s)
-  enfold' t (R k h z)     = k (foldr' h z t)
-  enfoldOf' l s (R k h z) = k (foldrOf' l h z s)
-  enscan s (R k h z) = snd (mapAccumR h' z s) where
-    h' r a = (r', k r') where r' = h a r
-  enscanOf l s (R k h z) = snd (mapAccumROf l h' z s) where
-    h' r a = (r', k r') where r' = h a r
-
+  run t (R k h z)     = k (foldr h z t)
+  runOf l s (R k h z) = k (foldrOf l h z s)
+  prefix s            = extend (run s)
+  prefixOf l s        = extend (runOf l s)
+  postfix t s         = run s (duplicate t)
+  postfixOf l t s     = runOf l s (duplicate t)
 
 instance Profunctor R where
   dimap f g (R k h z) = R (g.k) (h.f) z

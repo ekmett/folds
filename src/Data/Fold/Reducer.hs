@@ -11,8 +11,8 @@ module Data.Fold.Reducer
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
--- import Data.Fold.Class
--- import Data.Foldable hiding (sum, product)
+import Data.Fold.Class
+import Data.Foldable hiding (sum, product)
 import Data.Functor.Extend
 import Data.Functor.Apply
 import Data.Monoid
@@ -26,13 +26,23 @@ import Prelude hiding (sum, product, length)
 -- sequence algebras
 data Reducer b a = forall m. Reducer (m -> a) (b -> m) (m -> m -> m) m
 
-newtype M a s = M a
+newtype M a s = M { runM :: a }
 
 instance Reifies s (a -> a -> a, a) => Monoid (M a s) where
   mempty = M $ snd $ reflect (Proxy :: Proxy s)
   {-# INLINE mempty #-}
   mappend (M a) (M b) = M $ fst (reflect (Proxy :: Proxy s)) a b
   {-# INLINE mappend #-}
+
+instance Folding Reducer where
+  run s (Reducer k h m (z :: m)) = reify (m, z) $
+    \ (_ :: Proxy s) -> k $ runM (foldMap (M #. h) s :: M m s)
+  runOf l s (Reducer k h m (z :: m)) = reify (m, z) $
+    \ (_ :: Proxy s) -> k $ runM (foldMapOf l (M #. h) s :: M m s)
+  prefix s            = extend (run s)
+  prefixOf l s        = extend (runOf l s)
+  postfix t s         = run s (duplicate t)
+  postfixOf l t s     = runOf l s (duplicate t)
 
 instance Profunctor Reducer where
   dimap f g (Reducer k h m e) = Reducer (g.k) (h.f) m e
