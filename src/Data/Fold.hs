@@ -9,11 +9,17 @@
 --
 ----------------------------------------------------------------------------
 module Data.Fold
-  ( Folding(..)
+  (
   -- * Foldings
-  , L(..), L'(..)
+  -- ** Left Foldings
+    L(..), L'(..)
+  -- ** Monoidal Foldings
   , M(..)
+  -- ** Right Foldings
   , R(..)
+  -- * Folding Combinators
+  , Folding(..)
+  , beneath
   -- * Folding Homomorphisms
   -- $hom
   , AsRM(..)
