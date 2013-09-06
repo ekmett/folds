@@ -9,9 +9,9 @@ maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     experimental
 homepage:      http://github.com/ekmett/folds
 bug-reports:   http://github.com/ekmett/folds/issues
-copyright:     Copyright (C) 2013 Edward A. Kmett
+copyright:     Copyright (C) 2009-2013 Edward A. Kmett
 build-type:    Custom
-synopsis:      A playground full of comonadic folds.
+synopsis:      Beautiful Folds
 
 extra-source-files:
   .ghci
@@ -21,8 +21,7 @@ extra-source-files:
   CHANGELOG.markdown
   README.markdown
 
-description:
-  A playground full of comonadic folds.
+description: This package is a playground full of comonadic folds.
   .
   This style of fold is documented in <https://www.fpcomplete.com/user/edwardk/cellular-automata/part-2 "Cellular Automata, Part II: PNGs and Moore">
   .
