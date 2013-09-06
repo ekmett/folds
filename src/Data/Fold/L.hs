@@ -14,7 +14,7 @@ import Control.Lens
 import Data.Foldable
 import Data.Fold.Class
 import Data.Functor.Extend
-import Data.Functor.Apply
+import Data.Functor.Bind
 import Data.Monoid
 import Data.Profunctor.Unsafe
 import Unsafe.Coerce
@@ -98,6 +98,10 @@ instance Applicative (L b) where
 
   _ *> m = m
   {-# INLINE (*>) #-}
+
+instance Bind (L b) where
+  (>>-) = (>>=)
+  {-# INLINE (>>-) #-}
 
 instance Monad (L b) where
   return = pure
