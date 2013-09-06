@@ -11,7 +11,7 @@ homepage:      http://github.com/ekmett/folds
 bug-reports:   http://github.com/ekmett/folds/issues
 copyright:     Copyright (C) 2009-2013 Edward A. Kmett
 build-type:    Custom
-synopsis:      Beautiful Folds
+synopsis:      Beautiful Folding
 
 extra-source-files:
   .ghci
