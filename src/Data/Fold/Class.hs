@@ -5,7 +5,7 @@ module Data.Fold.Class
   , within
   ) where
 
-import Control.Lens
+import Control.Lens hiding (within)
 import Control.Lens.Internal.Setter
 import Data.Foldable
 import Data.Profunctor.Unsafe
