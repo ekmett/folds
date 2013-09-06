@@ -5,15 +5,15 @@ before_install:
   - cabal update
 
   # Try installing some of the build-deps with apt-get for speed.
-  - travis/cabal-apt-install $mode
+  - travis/cabal-apt-install --enable-tests
 
 install:
-  - cabal configure $mode
+  - cabal configure --enable-tests
   - cabal build
   - cabal install
 
 script:
-  - $script
+  - cabal test --show-details=always
 
 notifications:
   irc:
@@ -22,6 +22,3 @@ notifications:
     skip_join: true
     template:
       - "\x0313folds\x03/\x0306%{branch}\x03 \x0314%{commit}\x03 %{build_url} %{message}"
-
-env:
-  - mode="--enable-tests" script="cabal test --show-details=always"
