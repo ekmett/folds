@@ -16,10 +16,8 @@ module Data.Fold
   , R(..)
   -- * Folding Homomorphisms
   -- $hom
-  , r2m
-  , m2r
-  , l2m, l2r, l2l'
-  , l'2r, l'2m
+  , AsRM(..)
+  , AsL'(..)
   ) where
 
 import Data.Fold.Class
@@ -40,101 +38,75 @@ import Control.Category ((>>>))
 -- @
 --
 -- @
--- 'run' xs (f m)     ≡ 'run' xs m
--- 'prefix' xs (f m)  ≡ f ('prefix' xs m)
--- 'postfix' (f m) xs ≡ f ('postfix' m xs)
+-- 'run' xs (f φ)         ≡ 'run' xs φ
+-- 'prefix' xs (f φ)      ≡ f ('prefix' xs φ)
+-- 'prefixOf' l xs (f φ)  ≡ f ('prefixOf' l xs φ)
+-- 'postfix' (f φ) xs     ≡ f ('postfix' φ xs)
+-- 'postfixOf' l (f φ) xs ≡ f ('postfixOf' l φ xs)
 -- @
 
--- | @r2m@ is a folding homomorphism between right and monoidal foldings
---
--- @
--- run xs (r2m r)     ≡ run xs r
--- prefix xs (r2m r)  ≡ r2m (prefix xs r)
--- postfix (r2m r) xs ≡ r2m (postfix r xs)
--- @
---
--- 'foldr' and 'foldMap' are equivalent in expressive power for finite foldings.
---
--- For all right folds:
---
--- @
--- m2r.r2m = id
--- @
---
--- For legal monoidal folds, applied to structures that only require finite
--- reassociation:
---
--- @
--- r2m.m2r = id
--- @
-r2m :: R a b -> M a b
-r2m (R k h z) = M (\f -> k (f z)) h (.) id
+class AsRM p where
+  -- | 'asM' is a folding homomorphism to a monoidal folding
+  --
+  -- @
+  -- 'run' xs ('asM' φ)         ≡ 'run' xs φ
+  -- 'prefix' xs ('asM' φ)      ≡ 'asM' ('prefix' xs φ)
+  -- 'prefixOf' l xs ('asM' φ)  ≡ 'asM' ('prefixOf' l xs φ)
+  -- 'postfix' ('asM' φ) xs     ≡ 'asM' ('postfix' φ xs)
+  -- 'postfixOf' l ('asM' φ) xs ≡ 'asM' ('postfixOf' l φ xs)
+  -- @
+  asM :: p a b -> M a b
+  asM = asM . asR
 
--- | @m2r@ is a folding homomorphism between monoidal and right foldings
---
--- We can convert from a monoidal folding to a right folding.
---
--- @
--- run xs (m2r m)     ≡ run xs m
--- prefix xs (m2r m)  ≡ m2r (prefix xs m)
--- postfix (m2r m) xs ≡ m2r (postfix m xs)
--- @
-m2r :: M a b -> R a b
-m2r (M k h m z) = R k (m . h) z
+  -- | 'asR' is a folding homomorphism to a right folding
+  --
+  -- @
+  -- 'run' xs ('asR' φ)         ≡ 'run' xs φ
+  -- 'prefix' xs ('asR' φ)      ≡ 'asR' ('prefix' xs φ)
+  -- 'prefixOf' l xs ('asR' φ)  ≡ 'asR' ('prefixOf' l xs φ)
+  -- 'postfix' ('asR' φ) xs     ≡ 'asR' ('postfix' φ xs)
+  -- 'postfixOf' l ('asR' φ) xs ≡ 'asR' ('postfixOf' l φ xs)
+  -- @
+  asR :: p a b -> R a b
+  asR = asR . asM
 
--- |
---
--- We can convert from a left folding to a monoidal folding.
---
--- @
--- run xs (l2m l) ≡ run xs l
--- prefix xs (l2m l) ≡ l2m (prefix xs l)
--- @
-l2m :: L a b -> M a b
-l2m (L k h z) = M (\f -> k (f z)) (flip h) (>>>) id
+-- | We can convert from a lazy right fold to a monoidal fold
+instance AsRM R where
+  asM (R k h z) = M (\f -> k (f z)) h (.) id
+  asR = id
 
--- |
---
--- We can convert from a left folding to a right folding.
---
--- @
--- run xs (l2r l) ≡ run xs l
--- prefix xs (l2r l) ≡ l2r (prefix xs l)
--- @
-l2r :: L a b -> R a b
-l2r (L k h z) = R (\f -> k (f z)) (\b g x -> g (h x b)) id
+-- | We can convert from a monoidal fold to a lazy right fold
+instance AsRM M where
+  asR (M k h m z) = R k (m . h) z
+  asM = id
 
--- |
---
--- We can convert from a strict left folding to a right folding.
---
--- @
--- run xs (l'2r l') ≡ run xs l'
--- prefix xs (l'2r l') ≡ l'2r (prefix xs l')
--- @
-l'2r :: L' a b -> R a b
-l'2r (L' k h z) = R (\f -> k (f z)) (\b g x -> g $! h x b) id
+-- | We can convert from a lazy left folding to a right or monoidal fold
+instance AsRM L where
+  asM (L k h z) = M (\f -> k (f z)) (flip h) (>>>) id
+  asR (L k h z) = R (\f -> k (f z)) (\b g x -> g (h x b)) id
 
--- |
---
--- We can convert from a strict left folding to a monoidal folding.
---
--- @
--- run xs (l'2m l') ≡ run xs l'
--- prefix xs (l'2m l') ≡ l2m (prefix xs l')
--- @
-l'2m :: L' a b -> M a b
-l'2m = r2m.l'2r
+-- | We can convert from a strict left folding to a right or monoidal fold
+instance AsRM L' where
+  asR (L' k h z) = R (\f -> k (f z)) (\b g x -> g $! h x b) id
 
--- |
---
--- We can convert from a lazy left folding to a strict left folding.
---
--- @
--- run xs (l2l' l) ≡ run xs l'
--- prefix xs (l2l' l) ≡ l2l' (prefix xs l)
--- @
-l2l' :: L a b -> L' a b
-l2l' (L k h z) = L' (\(Box r) -> k r) (\(Box r) a -> Box (h r a)) (Box z)
+class AsL' p where
+  -- | 'asL'' is a folding homomorphism to a strict left folding
+  --
+  -- @
+  -- 'run' xs ('asL'' φ)         ≡ 'run' xs φ
+  -- 'prefix' xs ('asL'' φ)      ≡ 'asL'' ('prefix' xs φ)
+  -- 'prefixOf' l xs ('asL'' φ)  ≡ 'asL'' ('prefixOf' l xs φ)
+  -- 'postfix' ('asL'' φ) xs     ≡ 'asL'' ('postfix' φ xs)
+  -- 'postfixOf' l ('asL'' φ) xs ≡ 'asL'' ('postfixOf' l φ xs)
+  -- @
+  asL' :: p a b -> L' a b
+
+-- | We can convert a lazy fold to itself
+instance AsL' L' where
+  asL' = id
+
+-- | We can convert from a lazy left folding to a strict left folding.
+instance AsL' L where
+  asL' (L k h z) = L' (\(Box r) -> k r) (\(Box r) a -> Box (h r a)) (Box z)
 
 data Box a = Box a
