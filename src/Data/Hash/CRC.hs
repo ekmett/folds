@@ -24,6 +24,8 @@ import Data.Fold.L'
 import Data.Vector.Unboxed as Unboxed
 import Data.Word
 
+{-# ANN module "Hlint: ignore Use camelCase" #-}
+
 -- * 64 bit CRCs
 
 -- | Used in <http://en.wikipedia.org/wiki/High-Level_Data_Link_Control HDLC>, <http://en.wikipedia.org/wiki/Swiss-Prot#UniProtKB.2FSwiss-Prot Swiss-Prot> and <http://en.wikipedia.org/wiki/TrEMBL TrEMBL>, but it is <http://www0.cs.ucl.ac.uk/staff/d.jones/crcnote.pdf considered weak>
