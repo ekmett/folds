@@ -2,7 +2,7 @@
 {-# LANGUAGE Trustworthy #-}
 module Data.Fold.Class
   ( Folding(..)
-  , within
+  , beneath
   ) where
 
 import Control.Lens
@@ -37,15 +37,15 @@ class Choice p => Folding p where
 -- result of accumulating rewrapped in the 'Prism' if
 -- everything matches.
 --
--- >>> run [Left 1, Left 2, Left 3] $ within _Left $ R id (+) 0
+-- >>> run [Left 1, Left 2, Left 3] $ beneath _Left $ R id (+) 0
 -- Left 6
 --
--- >>> run [Left 1, Right 2, Right 3] $ within _Left $ R id (+) 0
+-- >>> run [Left 1, Right 2, Right 3] $ beneath _Left $ R id (+) 0
 -- Right 2
 --
 -- @
--- within :: Prism s t a b -> p a b -> p s t
--- within :: Iso s t a b   -> p a b -> p s t
+-- beneath :: Prism s t a b -> p a b -> p s t
+-- beneath :: Iso s t a b   -> p a b -> p s t
 -- @
-within :: Profunctor p => Overloaded p Mutator s t a b -> p a b -> p s t
-within l f = runMutator #. l (Mutator #. f)
+beneath :: Profunctor p => Overloaded p Mutator s t a b -> p a b -> p s t
+beneath l f = runMutator #. l (Mutator #. f)
