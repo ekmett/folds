@@ -15,8 +15,8 @@ import Data.Foldable
 import Data.Fold.Class
 import Data.Functor.Extend
 import Data.Functor.Apply
+import Data.Monoid
 import Data.Profunctor.Unsafe
-import Data.Traversable
 import Unsafe.Coerce
 import Prelude hiding (foldl)
 
@@ -99,6 +99,12 @@ instance Applicative (L b) where
   _ *> m = m
   {-# INLINE (*>) #-}
 
+instance Monad (L b) where
+  return = pure
+  {-# INLINE return #-}
+  m >>= f = L (\xs a -> run xs (f a)) Snoc Nil <*> m
+  {-# INLINE (>>=) #-}
+
 instance Extend (L b) where
   extended = extend
   {-# INLINE extended #-}
@@ -125,3 +131,14 @@ instance ComonadApply (L b) where
 
   _ @> m = m
   {-# INLINE (@>) #-}
+
+data SnocList a = Snoc (SnocList a) a | Nil
+
+instance Foldable SnocList where
+  foldl f z m0 = go m0 where
+    go (Snoc xs x) = f (go xs) x
+    go Nil = z
+  {-# INLINE foldl #-}
+  foldMap f (Snoc xs x) = foldMap f xs `mappend` f x
+  foldMap _ Nil = mempty
+  {-# INLINE foldMap #-}
