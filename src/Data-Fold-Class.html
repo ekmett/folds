@@ -8,28 +8,55 @@
 </head>
 <body>
 <pre><a name="line-1"></a><span class='hs-comment'>{-# LANGUAGE RankNTypes #-}</span>
-<a name="line-2"></a><span class='hs-keyword'>module</span> <span class='hs-conid'>Data</span><span class='hs-varop'>.</span><span class='hs-conid'>Fold</span><span class='hs-varop'>.</span><span class='hs-conid'>Class</span>
-<a name="line-3"></a>  <span class='hs-layout'>(</span> <span class='hs-conid'>Folding</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>..</span><span class='hs-layout'>)</span>
-<a name="line-4"></a>  <span class='hs-layout'>)</span> <span class='hs-keyword'>where</span>
-<a name="line-5"></a>
-<a name="line-6"></a><span class='hs-keyword'>import</span> <span class='hs-conid'>Control</span><span class='hs-varop'>.</span><span class='hs-conid'>Lens</span>
-<a name="line-7"></a><span class='hs-keyword'>import</span> <span class='hs-conid'>Data</span><span class='hs-varop'>.</span><span class='hs-conid'>Foldable</span>
-<a name="line-8"></a>
-<a name="line-9"></a><a name="Folding"></a><span class='hs-keyword'>class</span> <span class='hs-conid'>Choice</span> <span class='hs-varid'>p</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-conid'>Folding</span> <span class='hs-varid'>p</span> <span class='hs-keyword'>where</span>
-<a name="line-10"></a>  <span class='hs-varid'>enfold</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Foldable</span> <span class='hs-varid'>t</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-varid'>t</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>a</span>
-<a name="line-11"></a>  <span class='hs-varid'>enfold</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>enfoldOf</span> <span class='hs-varid'>folded</span>
+<a name="line-2"></a><span class='hs-comment'>{-# LANGUAGE Trustworthy #-}</span>
+<a name="line-3"></a><span class='hs-keyword'>module</span> <span class='hs-conid'>Data</span><span class='hs-varop'>.</span><span class='hs-conid'>Fold</span><span class='hs-varop'>.</span><span class='hs-conid'>Class</span>
+<a name="line-4"></a>  <span class='hs-layout'>(</span> <span class='hs-conid'>Folding</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>..</span><span class='hs-layout'>)</span>
+<a name="line-5"></a>  <span class='hs-layout'>,</span> <span class='hs-varid'>beneath</span>
+<a name="line-6"></a>  <span class='hs-layout'>)</span> <span class='hs-keyword'>where</span>
+<a name="line-7"></a>
+<a name="line-8"></a><span class='hs-keyword'>import</span> <span class='hs-conid'>Control</span><span class='hs-varop'>.</span><span class='hs-conid'>Lens</span>
+<a name="line-9"></a><span class='hs-keyword'>import</span> <span class='hs-conid'>Control</span><span class='hs-varop'>.</span><span class='hs-conid'>Lens</span><span class='hs-varop'>.</span><span class='hs-conid'>Internal</span><span class='hs-varop'>.</span><span class='hs-conid'>Setter</span>
+<a name="line-10"></a><span class='hs-keyword'>import</span> <span class='hs-conid'>Data</span><span class='hs-varop'>.</span><span class='hs-conid'>Foldable</span>
+<a name="line-11"></a><span class='hs-keyword'>import</span> <span class='hs-conid'>Data</span><span class='hs-varop'>.</span><span class='hs-conid'>Profunctor</span><span class='hs-varop'>.</span><span class='hs-conid'>Unsafe</span>
 <a name="line-12"></a>
-<a name="line-13"></a>  <span class='hs-varid'>enfoldOf</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Fold</span> <span class='hs-varid'>s</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>a</span>
-<a name="line-14"></a>
-<a name="line-15"></a>  <span class='hs-varid'>enfold'</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Foldable</span> <span class='hs-varid'>t</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-varid'>t</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>a</span>
-<a name="line-16"></a>  <span class='hs-varid'>enfold'</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>enfoldOf'</span> <span class='hs-varid'>folded</span>
-<a name="line-17"></a>
-<a name="line-18"></a>  <span class='hs-varid'>enfoldOf'</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Fold</span> <span class='hs-varid'>s</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>a</span>
-<a name="line-19"></a>  <span class='hs-varid'>enfoldOf'</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>enfoldOf</span>
-<a name="line-20"></a>
-<a name="line-21"></a>  <span class='hs-varid'>enscan</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Traversable</span> <span class='hs-varid'>t</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-varid'>t</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>t</span> <span class='hs-varid'>a</span>
-<a name="line-22"></a>  <span class='hs-varid'>enscan</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>enscanOf</span> <span class='hs-varid'>traverse</span>
-<a name="line-23"></a>
-<a name="line-24"></a>  <span class='hs-varid'>enscanOf</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Traversal</span> <span class='hs-varid'>s</span> <span class='hs-varid'>t</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>b</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>t</span>
+<a name="line-13"></a><span class='hs-comment'>--</span>
+<a name="line-14"></a><span class='hs-comment'>-- $setup</span>
+<a name="line-15"></a><span class='hs-comment'>-- &gt;&gt;&gt; import Data.Fold</span>
+<a name="line-16"></a>
+<a name="line-17"></a><a name="Folding"></a><span class='hs-keyword'>class</span> <span class='hs-conid'>Choice</span> <span class='hs-varid'>p</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-conid'>Folding</span> <span class='hs-varid'>p</span> <span class='hs-keyword'>where</span>
+<a name="line-18"></a>  <span class='hs-varid'>prefix</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Foldable</span> <span class='hs-varid'>t</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-varid'>t</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span>
+<a name="line-19"></a>  <span class='hs-varid'>prefix</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>prefixOf</span> <span class='hs-varid'>folded</span>
+<a name="line-20"></a>  <span class='hs-varid'>prefixOf</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Fold</span> <span class='hs-varid'>s</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span>
+<a name="line-21"></a>
+<a name="line-22"></a>  <span class='hs-varid'>postfix</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Foldable</span> <span class='hs-varid'>t</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>t</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span>
+<a name="line-23"></a>  <span class='hs-varid'>postfix</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>postfixOf</span> <span class='hs-varid'>folded</span>
+<a name="line-24"></a>  <span class='hs-varid'>postfixOf</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Fold</span> <span class='hs-varid'>s</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span>
+<a name="line-25"></a>
+<a name="line-26"></a>  <span class='hs-varid'>run</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Foldable</span> <span class='hs-varid'>t</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-varid'>t</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>b</span>
+<a name="line-27"></a>  <span class='hs-varid'>run</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>runOf</span> <span class='hs-varid'>folded</span>
+<a name="line-28"></a>  <span class='hs-varid'>runOf</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Fold</span> <span class='hs-varid'>s</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>b</span>
+<a name="line-29"></a>
+<a name="line-30"></a><span class='hs-comment'>-- enscanOf :: Traversal s t a b -&gt; s -&gt; p a b -&gt; t</span>
+<a name="line-31"></a>
+<a name="line-32"></a><a name="beneath"></a><span class='hs-comment'>-- | Lift a 'Folding' into a 'Prism'.</span>
+<a name="line-33"></a><span class='hs-comment'>--</span>
+<a name="line-34"></a><span class='hs-comment'>-- This acts like a generalized notion of \"costrength\",</span>
+<a name="line-35"></a><span class='hs-comment'>-- when applied to a 'Folding', causing it to return the</span>
+<a name="line-36"></a><span class='hs-comment'>-- left-most value that fails to match the Prism, or the</span>
+<a name="line-37"></a><span class='hs-comment'>-- result of accumulating rewrapped in the 'Prism' if</span>
+<a name="line-38"></a><span class='hs-comment'>-- everything matches.</span>
+<a name="line-39"></a><span class='hs-comment'>--</span>
+<a name="line-40"></a><span class='hs-comment'>-- &gt;&gt;&gt; run [Left 1, Left 2, Left 3] $ beneath _Left $ R id (+) 0</span>
+<a name="line-41"></a><span class='hs-comment'>-- Left 6</span>
+<a name="line-42"></a><span class='hs-comment'>--</span>
+<a name="line-43"></a><span class='hs-comment'>-- &gt;&gt;&gt; run [Left 1, Right 2, Right 3] $ beneath _Left $ R id (+) 0</span>
+<a name="line-44"></a><span class='hs-comment'>-- Right 2</span>
+<a name="line-45"></a><span class='hs-comment'>--</span>
+<a name="line-46"></a><span class='hs-comment'>-- @</span>
+<a name="line-47"></a><span class='hs-comment'>-- beneath :: Prism s t a b -&gt; p a b -&gt; p s t</span>
+<a name="line-48"></a><span class='hs-comment'>-- beneath :: Iso s t a b   -&gt; p a b -&gt; p s t</span>
+<a name="line-49"></a><span class='hs-comment'>-- @</span>
+<a name="line-50"></a><span class='hs-definition'>beneath</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Profunctor</span> <span class='hs-varid'>p</span> <span class='hs-keyglyph'>=&gt;</span> <span class='hs-conid'>Overloaded</span> <span class='hs-varid'>p</span> <span class='hs-conid'>Mutator</span> <span class='hs-varid'>s</span> <span class='hs-varid'>t</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>p</span> <span class='hs-varid'>s</span> <span class='hs-varid'>t</span>
+<a name="line-51"></a><span class='hs-definition'>beneath</span> <span class='hs-varid'>l</span> <span class='hs-varid'>f</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>runMutator</span> <span class='hs-cpp'>#.</span> <span class='hs-varid'>l</span> <span class='hs-layout'>(</span><span class='hs-conid'>Mutator</span> <span class='hs-cpp'>#.</span> <span class='hs-varid'>f</span><span class='hs-layout'>)</span>
 </pre></body>
 </html>
