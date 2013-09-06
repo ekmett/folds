@@ -23,12 +23,16 @@ import Prelude hiding (foldl)
 -- left folds
 data L b a = forall r. L (r -> a) (r -> b -> r) r
 
+-- | efficient 'prefix', leaky 'postfix'
 instance Folding L where
   run t (L k h z)     = k (foldl h z t)
+  run1 t (L k h z)    = k (h z t)
   runOf l s (L k h z) = k (foldlOf l h z s)
   prefix s            = run s . duplicate
+  prefix1 a           = run1 a . duplicate
   prefixOf l s        = runOf l s . duplicate
   postfix t s         = extend (run s) t
+  postfix1 t a        = extend (run1 a) t
   postfixOf l t s     = extend (runOf l s) t
 
 {-

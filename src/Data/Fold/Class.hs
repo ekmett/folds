@@ -14,17 +14,40 @@ import Data.Profunctor.Unsafe
 -- $setup
 -- >>> import Data.Fold
 
+newtype One a = One a
+
+instance Foldable One where
+  foldMap f (One a) = f a
+
 class Choice p => Folding p where
   prefix :: Foldable t => t a -> p a b -> p a b
   prefix = prefixOf folded
+  {-# INLINE prefix #-}
+
+  prefix1 :: a -> p a b -> p a b
+  prefix1 = prefix . One
+  {-# INLINE prefix1 #-}
+
   prefixOf :: Fold s a -> s -> p a b -> p a b
 
   postfix :: Foldable t => p a b -> t a -> p a b
   postfix = postfixOf folded
+  {-# INLINE postfix #-}
+
+  postfix1 :: p a b -> a -> p a b
+  postfix1 p = postfix p . One
+  {-# INLINE postfix1 #-}
+
   postfixOf :: Fold s a -> p a b -> s -> p a b
 
   run :: Foldable t => t a -> p a b -> b
   run = runOf folded
+  {-# INLINE run #-}
+
+  run1 :: a -> p a b -> b
+  run1 = run . One
+  {-# INLINE run1 #-}
+
   runOf :: Fold s a -> s -> p a b -> b
 
 -- enscanOf :: Traversal s t a b -> s -> p a b -> t

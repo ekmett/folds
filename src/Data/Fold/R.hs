@@ -23,12 +23,16 @@ import Prelude hiding (foldr, sum, product, length)
 -- right folds
 data R b a = forall r. R (r -> a) (b -> r -> r) r
 
+-- | leaky 'prefix', efficient 'postfix'
 instance Folding R where
   run t (R k h z)     = k (foldr h z t)
+  run1 t (R k h z)    = k (h t z)
   runOf l s (R k h z) = k (foldrOf l h z s)
   prefix s            = extend (run s)
+  prefix1 a           = extend (run1 a)
   prefixOf l s        = extend (runOf l s)
   postfix t s         = run s (duplicate t)
+  postfix1 t a        = run1 a (duplicate t)
   postfixOf l t s     = runOf l s (duplicate t)
 
 instance Profunctor R where

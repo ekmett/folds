@@ -29,20 +29,26 @@ import Prelude hiding (sum, product, length)
 -- | A 'foldMap' caught in amber.
 data M b a = forall m. M (m -> a) (b -> m) (m -> m -> m) m
 
+-- | efficient 'prefix', efficient 'postfix'
 instance Folding M where
   run s (M k h m (z :: m)) = reify (m, z) $
     \ (_ :: Proxy s) -> k $ runN (foldMap (N #. h) s :: N m s)
+  run1 a (M k h _ _) = k (h a)
   runOf l s (M k h m (z :: m)) = reify (m, z) $
     \ (_ :: Proxy s) -> k $ runN (foldMapOf l (N #. h) s :: N m s)
   prefix s (M k h m (z :: m)) = reify (m, z) $
     \ (_ :: Proxy s) -> case runN (foldMap (N #. h) s :: N m s) of
       x -> M (\y -> k (m x y)) h m z
+  prefix1 a (M k h m z) = case h a of
+     x -> M (\y -> k (m x y)) h m z
   prefixOf l s (M k h m (z :: m)) = reify (m, z) $
     \ (_ :: Proxy s) -> case runN (foldMapOf l (N #. h) s :: N m s) of
       x -> M (\y -> k (m x y)) h m z
   postfix (M k h m (z :: m)) s = reify (m, z) $
     \ (_ :: Proxy s) -> case runN (foldMap (N #. h) s :: N m s) of
       y -> M (\x -> k (m x y)) h m z
+  postfix1 (M k h m z) a = case h a of
+     y -> M (\x -> k (m x y)) h m z
   postfixOf l (M k h m (z :: m)) s = reify (m, z) $
     \ (_ :: Proxy s) -> case runN (foldMapOf l (N #. h) s :: N m s) of
       y -> M (\x -> k (m x y)) h m z
