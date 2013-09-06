@@ -69,6 +69,7 @@ library
     Data.Fold.L'
     Data.Fold.M
     Data.Fold.R
+    Data.Hash.Adler32
     Data.Hash.CRC
 
   ghc-options: -Wall
