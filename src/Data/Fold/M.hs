@@ -7,7 +7,7 @@
 -- |
 -- Unlike 'Data.Fold.L' and 'Data.Fold.R' this 'Comonad'
 -- is based on a @(->) r@ 'Comonad' for a 'Monoid' @r@ rather than
--- than on a 'Store r'.
+-- than on the @'Store' r@ 'Comonad'.
 module Data.Fold.M
   ( M(..)
   ) where
