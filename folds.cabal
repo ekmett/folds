@@ -65,6 +65,7 @@ library
     Data.Fold
     Data.Fold.Class
     Data.Fold.L
+    Data.Fold.L'
     Data.Fold.M
     Data.Fold.R
 

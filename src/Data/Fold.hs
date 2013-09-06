@@ -1,19 +1,30 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (C) 2009-2013 Edward Kmett
+-- License     :  BSD-style (see the file LICENSE)
+--
+-- Maintainer  :  Edward Kmett <ekmett@gmail.com>
+-- Stability   :  experimental
+-- Portability :  non-portable
+--
+----------------------------------------------------------------------------
 module Data.Fold
   ( Folding(..)
   -- * Foldings
-  , L(..)
+  , L(..), L'(..)
   , M(..)
   , R(..)
   -- * Folding Homomorphisms
   -- $hom
   , r2m
   , m2r
-  , l2m
-  , l2r
+  , l2m, l2r, l2l'
+  , l'2r, l'2m
   ) where
 
 import Data.Fold.Class
 import Data.Fold.L
+import Data.Fold.L'
 import Data.Fold.M
 import Data.Fold.R
 import Control.Category ((>>>))
@@ -92,3 +103,38 @@ l2m (L k h z) = M (\f -> k (f z)) (flip h) (>>>) id
 -- @
 l2r :: L a b -> R a b
 l2r (L k h z) = R (\f -> k (f z)) (\b g x -> g (h x b)) id
+
+-- |
+--
+-- We can convert from a strict left folding to a right folding.
+--
+-- @
+-- run xs (l'2r l') ≡ run xs l'
+-- prefix xs (l'2r l') ≡ l'2r (prefix xs l')
+-- @
+l'2r :: L' a b -> R a b
+l'2r (L' k h z) = R (\f -> k (f z)) (\b g x -> g $! h x b) id
+
+-- |
+--
+-- We can convert from a strict left folding to a monoidal folding.
+--
+-- @
+-- run xs (l'2m l') ≡ run xs l'
+-- prefix xs (l'2m l') ≡ l2m (prefix xs l')
+-- @
+l'2m :: L' a b -> M a b
+l'2m = r2m.l'2r
+
+-- |
+--
+-- We can convert from a lazy left folding to a strict left folding.
+--
+-- @
+-- run xs (l2l' l) ≡ run xs l'
+-- prefix xs (l2l' l) ≡ l2l' (prefix xs l)
+-- @
+l2l' :: L a b -> L' a b
+l2l' (L k h z) = L' (\(Box r) -> k r) (\(Box r) a -> Box (h r a)) (Box z)
+
+data Box a = Box a
