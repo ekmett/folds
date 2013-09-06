@@ -21,7 +21,7 @@ import Unsafe.Coerce
 import Prelude hiding (foldr, sum, product, length)
 
 -- right folds
-data R b a = forall r. R (r -> a) (b -> r -> r) r
+data R a b = forall r. R (r -> b) (a -> r -> r) r
 
 -- | leaky 'prefix', efficient 'postfix'
 instance Folding R where
@@ -67,7 +67,7 @@ instance Functor (R a) where
   (<$) b = \_ -> pure b
   {-# INLINE (<$) #-}
 
-instance Comonad (R b) where
+instance Comonad (R a) where
   extract (R k _ z) = k z
   {-# INLINE extract #-}
 
@@ -79,18 +79,18 @@ instance Comonad (R b) where
 
 data Pair a b = Pair !a !b
 
-instance Bind (R b) where
+instance Bind (R a) where
   (>>-) = (>>=)
   {-# INLINE (>>-) #-}
 
-instance Monad (R b) where
+instance Monad (R a) where
   return b = R (\() -> b) (\_ () -> ()) ()
   {-# INLINE return #-}
 
   m >>= f = R (\xs a -> run xs (f a)) (:) [] <*> m
   {-# INLINE (>>=) #-}
 
-instance Applicative (R b) where
+instance Applicative (R a) where
   pure b = R (\() -> b) (\_ () -> ()) ()
   {-# INLINE pure #-}
 
@@ -106,14 +106,14 @@ instance Applicative (R b) where
   _ *> m = m
   {-# INLINE (*>) #-}
 
-instance Extend (R b) where
+instance Extend (R a) where
   extended = extend
   {-# INLINE extended #-}
 
   duplicated = duplicate
   {-# INLINE duplicated #-}
 
-instance Apply (R b) where
+instance Apply (R a) where
   (<.>) = (<*>)
   {-# INLINE (<.>) #-}
 
@@ -123,7 +123,7 @@ instance Apply (R b) where
   _ .> m = m
   {-# INLINE (.>) #-}
 
-instance ComonadApply (R b) where
+instance ComonadApply (R a) where
   (<@>) = (<*>)
   {-# INLINE (<@>) #-}
 

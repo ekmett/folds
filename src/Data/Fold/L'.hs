@@ -21,7 +21,7 @@ import Unsafe.Coerce
 import Prelude hiding (foldl)
 
 -- | strict left folds
-data L' b a = forall r. L' (r -> a) (r -> b -> r) r
+data L' a b = forall r. L' (r -> b) (r -> a -> r) r
 
 -- | efficient 'prefix', leaky 'postfix'
 instance Folding L' where
@@ -67,7 +67,7 @@ instance Functor (L' a) where
   (<$) b = \_ -> pure b
   {-# INLINE (<$) #-}
 
-instance Comonad (L' b) where
+instance Comonad (L' a) where
   extract (L' k _ z) = k z
   {-# INLINE extract #-}
 
@@ -79,7 +79,7 @@ instance Comonad (L' b) where
 
 data Pair a b = Pair !a !b
 
-instance Applicative (L' b) where
+instance Applicative (L' a) where
   pure b = L' (\() -> b) (\() _ -> ()) ()
   {-# INLINE pure #-}
 
@@ -95,24 +95,24 @@ instance Applicative (L' b) where
   _ *> m = m
   {-# INLINE (*>) #-}
 
-instance Bind (L' b) where
+instance Bind (L' a) where
   (>>-) = (>>=)
   {-# INLINE (>>-) #-}
 
-instance Monad (L' b) where
+instance Monad (L' a) where
   return = pure
   {-# INLINE return #-}
   m >>= f = L' (\xs a -> run xs (f a)) Snoc Nil <*> m
   {-# INLINE (>>=) #-}
 
-instance Extend (L' b) where
+instance Extend (L' a) where
   extended = extend
   {-# INLINE extended #-}
 
   duplicated = duplicate
   {-# INLINE duplicated #-}
 
-instance Apply (L' b) where
+instance Apply (L' a) where
   (<.>) = (<*>)
   {-# INLINE (<.>) #-}
 
@@ -122,7 +122,7 @@ instance Apply (L' b) where
   _ .> m = m
   {-# INLINE (.>) #-}
 
-instance ComonadApply (L' b) where
+instance ComonadApply (L' a) where
   (<@>) = (<*>)
   {-# INLINE (<@>) #-}
 

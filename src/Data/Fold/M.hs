@@ -27,7 +27,7 @@ import Unsafe.Coerce
 import Prelude hiding (sum, product, length)
 
 -- | A 'foldMap' caught in amber.
-data M b a = forall m. M (m -> a) (b -> m) (m -> m -> m) m
+data M a b = forall m. M (m -> b) (a -> m) (m -> m -> m) m
 
 -- | efficient 'prefix', efficient 'postfix'
 instance Folding M where
@@ -85,7 +85,7 @@ instance Functor (M a) where
   (<$) b = \_ -> pure b
   {-# INLINE (<$) #-}
 
-instance Comonad (M b) where
+instance Comonad (M a) where
   extract (M k _ _ z) = k z
   {-# INLINE extract #-}
 
@@ -94,7 +94,7 @@ instance Comonad (M b) where
 
 data Pair a b = Pair !a !b
 
-instance Applicative (M b) where
+instance Applicative (M a) where
   pure b = M (\() -> b) (\_ -> ()) (\() () -> ()) ()
   {-# INLINE pure #-}
 
@@ -111,24 +111,24 @@ instance Applicative (M b) where
   _ *> m = m
   {-# INLINE (*>) #-}
 
-instance Bind (M b) where
+instance Bind (M a) where
   (>>-) = (>>=)
   {-# INLINE (>>-) #-}
 
-instance Monad (M b) where
+instance Monad (M a) where
   return = pure
   {-# INLINE return #-}
   m >>= f = M (\xs a -> run xs (f a)) One Two Zero <*> m
   {-# INLINE (>>=) #-}
 
-instance Extend (M b) where
+instance Extend (M a) where
   extended = extend
   {-# INLINE extended #-}
 
   duplicated = duplicate
   {-# INLINE duplicated #-}
 
-instance Apply (M b) where
+instance Apply (M a) where
   (<.>) = (<*>)
   {-# INLINE (<.>) #-}
 
@@ -138,7 +138,7 @@ instance Apply (M b) where
   _ .> m = m
   {-# INLINE (.>) #-}
 
-instance ComonadApply (M b) where
+instance ComonadApply (M a) where
   (<@>) = (<*>)
   {-# INLINE (<@>) #-}
 
