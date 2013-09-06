@@ -105,11 +105,7 @@ instance Bind (M b) where
 instance Monad (M b) where
   return = pure
   {-# INLINE return #-}
-  M k h m z >>= f = M
-    (\(Pair t a) -> run t (f (k a)))
-    (\b -> Pair (One b) (h b))
-    (\(Pair l x) (Pair r y) -> Pair (Two l r) (m x y))
-    (Pair Zero z)
+  m >>= f = M (\xs a -> run xs (f a)) One Two Zero <*> m
   {-# INLINE (>>=) #-}
 
 instance Extend (M b) where
