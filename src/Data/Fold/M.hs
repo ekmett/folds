@@ -29,16 +29,23 @@ import Prelude hiding (sum, product, length)
 -- | A 'foldMap' caught in amber.
 data M b a = forall m. M (m -> a) (b -> m) (m -> m -> m) m
 
-
 instance Folding M where
   run s (M k h m (z :: m)) = reify (m, z) $
     \ (_ :: Proxy s) -> k $ runN (foldMap (N #. h) s :: N m s)
   runOf l s (M k h m (z :: m)) = reify (m, z) $
     \ (_ :: Proxy s) -> k $ runN (foldMapOf l (N #. h) s :: N m s)
-  prefix s            = extend (run s)
-  prefixOf l s        = extend (runOf l s)
-  postfix t s         = run s (duplicate t)
-  postfixOf l t s     = runOf l s (duplicate t)
+  prefix s (M k h m (z :: m)) = reify (m, z) $
+    \ (_ :: Proxy s) -> case runN (foldMap (N #. h) s :: N m s) of
+      x -> M (\y -> k (m x y)) h m z
+  prefixOf l s (M k h m (z :: m)) = reify (m, z) $
+    \ (_ :: Proxy s) -> case runN (foldMapOf l (N #. h) s :: N m s) of
+      x -> M (\y -> k (m x y)) h m z
+  postfix (M k h m (z :: m)) s = reify (m, z) $
+    \ (_ :: Proxy s) -> case runN (foldMap (N #. h) s :: N m s) of
+      y -> M (\x -> k (m x y)) h m z
+  postfixOf l (M k h m (z :: m)) s = reify (m, z) $
+    \ (_ :: Proxy s) -> case runN (foldMapOf l (N #. h) s :: N m s) of
+      y -> M (\x -> k (m x y)) h m z
 
 instance Profunctor M where
   dimap f g (M k h m e) = M (g.k) (h.f) m e
