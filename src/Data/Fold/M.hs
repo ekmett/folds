@@ -18,7 +18,7 @@ import Control.Lens
 import Data.Fold.Class
 import Data.Foldable hiding (sum, product)
 import Data.Functor.Extend
-import Data.Functor.Apply
+import Data.Functor.Bind
 import Data.Monoid
 import Data.Profunctor.Unsafe
 import Data.Proxy
@@ -97,6 +97,10 @@ instance Applicative (M b) where
 
   _ *> m = m
   {-# INLINE (*>) #-}
+
+instance Bind (M b) where
+  (>>-) = (>>=)
+  {-# INLINE (>>-) #-}
 
 instance Monad (M b) where
   return = pure
