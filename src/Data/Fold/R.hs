@@ -14,7 +14,7 @@ import Control.Lens
 import Data.Foldable hiding (sum, product)
 import Data.Fold.Class
 import Data.Functor.Extend
-import Data.Functor.Apply
+import Data.Functor.Bind
 import Data.Profunctor.Unsafe
 -- import Data.Traversable
 import Unsafe.Coerce
@@ -74,6 +74,17 @@ instance Comonad (R b) where
   {-# INLINE extend #-}
 
 data Pair a b = Pair !a !b
+
+instance Bind (R b) where
+  (>>-) = (>>=)
+  {-# INLINE (>>-) #-}
+
+instance Monad (R b) where
+  return b = R (\() -> b) (\_ () -> ()) ()
+  {-# INLINE return #-}
+
+  m >>= f = R (\xs a -> run xs (f a)) (:) [] <*> m
+  {-# INLINE (>>=) #-}
 
 instance Applicative (R b) where
   pure b = R (\() -> b) (\_ () -> ()) ()
