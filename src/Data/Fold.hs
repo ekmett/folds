@@ -45,10 +45,20 @@ import Control.Category ((>>>))
 --
 -- @
 -- 'run' xs (f φ)         ≡ 'run' xs φ
+-- 'runOf' l xs (f φ)     ≡ 'runOf' l xs φ
 -- 'prefix' xs (f φ)      ≡ f ('prefix' xs φ)
 -- 'prefixOf' l xs (f φ)  ≡ f ('prefixOf' l xs φ)
 -- 'postfix' (f φ) xs     ≡ f ('postfix' φ xs)
 -- 'postfixOf' l (f φ) xs ≡ f ('postfixOf' l φ xs)
+-- 'left'' (f φ)          ≡ f ('left'' φ)
+-- 'right'' (f φ)         ≡ f ('right'' φ)
+-- 'dimap' l r (f φ)      ≡ f ('dimap' l r φ)
+-- 'extract' (f φ)        ≡ 'extract' φ
+-- 'extend' h (f φ)       ≡ f ('extend' (h . f) φ)
+-- 'pure' a               ≡ f ('pure' a)
+-- f φ '<*>' f ψ          ≡ f (φ '<*>' ψ)
+-- 'return' a             ≡ f ('return' a)
+-- f φ '>>=' f . k        ≡ f (φ '>>=' k)
 -- @
 
 class AsRM p where
@@ -60,6 +70,15 @@ class AsRM p where
   -- 'prefixOf' l xs ('asM' φ)  ≡ 'asM' ('prefixOf' l xs φ)
   -- 'postfix' ('asM' φ) xs     ≡ 'asM' ('postfix' φ xs)
   -- 'postfixOf' l ('asM' φ) xs ≡ 'asM' ('postfixOf' l φ xs)
+  -- 'left'' ('asM' φ)          ≡ 'asM' ('left'' φ)
+  -- 'right'' ('asM' φ)         ≡ 'asM' ('right'' φ)
+  -- 'dimap' l r ('asM' φ)      ≡ 'asM' ('dimap' l r φ)
+  -- 'extract' ('asM' φ)        ≡ 'extract' φ
+  -- 'extend' h ('asM' φ)       ≡ 'asM' ('extend' (h . 'asM') φ)
+  -- 'pure' a                  ≡ 'asM' ('pure' a)
+  -- 'asM' φ '<*>' 'asM' ψ        ≡ 'asM' (φ '<*>' ψ)
+  -- 'return' a                ≡ 'asM' ('return' a)
+  -- 'asM' φ '>>=' 'asM' . k      ≡ 'asM' (φ '>>=' k)
   -- @
   asM :: p a b -> M a b
   asM = asM . asR
@@ -72,6 +91,15 @@ class AsRM p where
   -- 'prefixOf' l xs ('asR' φ)  ≡ 'asR' ('prefixOf' l xs φ)
   -- 'postfix' ('asR' φ) xs     ≡ 'asR' ('postfix' φ xs)
   -- 'postfixOf' l ('asR' φ) xs ≡ 'asR' ('postfixOf' l φ xs)
+  -- 'left'' ('asR' φ)          ≡ 'asR' ('left'' φ)
+  -- 'right'' ('asR' φ)         ≡ 'asR' ('right'' φ)
+  -- 'dimap' l r ('asR' φ)      ≡ 'asR' ('dimap' l r φ)
+  -- 'extract' ('asR' φ)        ≡ 'extract' φ
+  -- 'extend' h ('asR' φ)       ≡ 'asR' ('extend' (h . 'asR') φ)
+  -- 'pure' a                  ≡ 'asR' ('pure' a)
+  -- 'asR' φ '<*>' 'asR' ψ        ≡ 'asR' (φ '<*>' ψ)
+  -- 'return' a                ≡ 'asR' ('return' a)
+  -- 'asR' φ '>>=' 'asR' . k      ≡ 'asR' (φ '>>=' k)
   -- @
   asR :: p a b -> R a b
   asR = asR . asM
@@ -104,6 +132,15 @@ class AsL' p where
   -- 'prefixOf' l xs ('asL'' φ)  ≡ 'asL'' ('prefixOf' l xs φ)
   -- 'postfix' ('asL'' φ) xs     ≡ 'asL'' ('postfix' φ xs)
   -- 'postfixOf' l ('asL'' φ) xs ≡ 'asL'' ('postfixOf' l φ xs)
+  -- 'left'' ('asL'' φ)          ≡ 'asL'' ('left'' φ)
+  -- 'right'' ('asL'' φ)         ≡ 'asL'' ('right'' φ)
+  -- 'dimap' l r ('asL'' φ)      ≡ 'asL'' ('dimap' l r φ)
+  -- 'extract' ('asL'' φ)        ≡ 'extract' φ
+  -- 'extend' h ('asL'' φ)       ≡ 'asL'' ('extend' (h . 'asL'') φ)
+  -- 'pure' a                   ≡ 'asL'' ('pure' a)
+  -- 'asL'' φ '<*>' 'asL'' ψ       ≡ 'asL'' (φ '<*>' ψ)
+  -- 'return' a                 ≡ 'asL'' ('return' a)
+  -- 'asL'' φ '>>=' 'asL'' . k     ≡ 'asL'' (φ '>>=' k)
   -- @
   asL' :: p a b -> L' a b
 
