@@ -1,3 +1,4 @@
+{-# LANGUAGE DefaultSignatures #-}
 -----------------------------------------------------------------------------
 -- |
 -- Copyright   :  (C) 2009-2013 Edward Kmett
@@ -17,22 +18,25 @@ module Data.Fold
   , beneath
   -- * Scans
   -- ** Left Scans
-  , L1(..), L1'(..)
+  , L1(..)  -- lazy Mealy machine
+  , L1'(..) -- strict Mealy machine
   -- ** Semigroup Scans
-  , M1(..)
+  , M1(..) -- semigroup reducer
   -- ** Right Scans
-  , R1(..)
+  , R1(..) -- reversed lazy Mealy machine
   -- * Foldings
   -- ** Left Foldings
-  , L(..), L'(..)
+  , L(..) -- lazy Moore machine
+  , L'(..) -- strict Moore machine
   -- ** Monoidal Foldings
-  , M(..)
+  , M(..) -- monoidal reducer
   -- ** Right Foldings
-  , R(..)
+  , R(..) -- reversed lazy Moore machine
   -- * Homomorphisms
   -- ** Scan Homomorphisms
   -- $scanhom
   , AsRM1(..)
+  , AsL1'(..)
 
   -- ** Folding Homomorphisms
   -- $foldinghom
@@ -197,7 +201,25 @@ instance AsRM1 L' where
 instance AsRM L' where
   asR (L' k h z) = R (\f -> k (f z)) (\b g x -> g $! h x b) id
 
-class AsL' p where
+class AsL1' p where
+  -- | Scan homomorphism to a strict Mealy machine
+  asL1' :: p a b -> L1' a b
+  default asL1' :: AsL' p => p a b -> L1' a b
+  asL1' = asL1'.asL'
+
+instance AsL1' L1' where
+  asL1' = id
+
+instance AsL1' L1 where
+  asL1' (L1 k h z) = L1' (\(Box r) -> k r) (\(Box r) a -> Box (h r a)) (\a -> Box (z a))
+
+instance AsL1' L where
+  asL1' (L k h z) = L1' (\(Box r) -> k r) (\(Box r) a -> Box (h r a)) (\a -> Box (h z a))
+
+instance AsL1' L' where
+  asL1' (L' k h z) = L1' k h (h z)
+
+class AsL1' p => AsL' p where
   -- | 'asL'' is a folding homomorphism to a strict left folding
   --
   -- @
