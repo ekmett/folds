@@ -6,6 +6,7 @@
 {-# LANGUAGE ExistentialQuantification #-}
 module Data.Fold.L
   ( L(..)
+  , unfoldL
   ) where
 
 import Control.Applicative
@@ -22,6 +23,11 @@ import Prelude hiding (foldl)
 
 -- left folds
 data L a b = forall r. L (r -> b) (r -> a -> r) r
+
+-- | Construct a Moore machine from a state valuation and transition function
+unfoldL :: (s -> (b, a -> s)) -> s -> L a b
+unfoldL f = L (fst . f) (snd . f)
+{-# INLINE unfoldL #-}
 
 -- | efficient 'prefix', leaky 'postfix'
 instance Folding L where
