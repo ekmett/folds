@@ -1,5 +1,5 @@
 name:          folds
-category:      Data, Vector
+category:      Data, Comonads, Enumerator
 version:       0.1
 license:       BSD3
 cabal-version: >= 1.8
