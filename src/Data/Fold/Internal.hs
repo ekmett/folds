@@ -4,6 +4,7 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 module Data.Fold.Internal
   ( SnocList(..)
+  , SnocList1(..)
   , Maybe'(..), maybe'
   , Pair'(..)
   , N(..)
@@ -15,7 +16,7 @@ module Data.Fold.Internal
 import Control.Applicative
 import Data.Data
 import Data.Foldable
-import Data.Monoid
+import Data.Monoid hiding (First)
 import Data.Proxy
 import Data.Reflection
 import Data.Traversable
@@ -27,6 +28,7 @@ data SnocList a = Snoc (SnocList a) a | Nil
 instance Functor SnocList where
   fmap f (Snoc xs x) = Snoc (fmap f xs) (f x)
   fmap _ Nil = Nil
+  {-# INLINABLE fmap #-}
 
 instance Foldable SnocList where
   foldl f z m0 = go m0 where
@@ -35,12 +37,40 @@ instance Foldable SnocList where
   {-# INLINE foldl #-}
   foldMap f (Snoc xs x) = foldMap f xs `mappend` f x
   foldMap _ Nil = mempty
-  {-# INLINE foldMap #-}
+  {-# INLINABLE foldMap #-}
 
 instance Traversable SnocList where
   traverse f (Snoc xs x) = Snoc <$> traverse f xs <*> f x
   traverse _ Nil = pure Nil
-  {-# INLINE traverse #-}
+  {-# INLINABLE traverse #-}
+
+data SnocList1 a = Snoc1 (SnocList1 a) a | First a
+  deriving (Eq,Ord,Show,Read,Typeable,Data)
+
+instance Functor SnocList1 where
+  fmap f (Snoc1 xs x) = Snoc1 (fmap f xs) (f x)
+  fmap f (First a) = First (f a)
+  {-# INLINABLE fmap #-}
+
+instance Foldable SnocList1 where
+  foldl f z m0 = go m0 where
+    go (Snoc1 xs x) = f (go xs) x
+    go (First a) = f z a
+  {-# INLINE foldl #-}
+  foldl1 f m0 = go m0 where
+    go (Snoc1 xs x) = f (go xs) x
+    go (First a) = a
+  {-# INLINE foldl1 #-}
+  foldMap f (Snoc1 xs x) = foldMap f xs `mappend` f x
+  foldMap f (First a) = f a
+  {-# INLINABLE foldMap #-}
+
+instance Traversable SnocList1 where
+  traverse f (Snoc1 xs x) = Snoc1 <$> traverse f xs <*> f x
+  traverse f (First a) = First <$> f a
+  {-# INLINABLE traverse #-}
+
+
 
 -- | Strict 'Maybe'
 data Maybe' a = Nothing' | Just' !a
@@ -88,8 +118,7 @@ instance Traversable Tree where
   traverse f (Two a b) = Two <$> traverse f a <*> traverse f b
 
 -- | Strict Pair
-data Pair' a b = Pair' !a !b
-  deriving (Eq,Ord,Show,Read,Typeable,Data)
+data Pair' a b = Pair' !a !b deriving (Eq,Ord,Show,Read,Typeable,Data)
 
 instance (Monoid a, Monoid b) => Monoid (Pair' a b) where
   mempty = Pair' mempty mempty
@@ -97,7 +126,7 @@ instance (Monoid a, Monoid b) => Monoid (Pair' a b) where
   mappend (Pair' a b) (Pair' c d) = Pair' (mappend a c) (mappend b d)
   {-# INLINE mappend #-}
 
-newtype An a = An a
+newtype An a = An a deriving (Eq,Ord,Show,Read,Typeable,Data)
 
 instance Functor An where
   fmap f (An a) = An (f a)
@@ -108,7 +137,7 @@ instance Foldable An where
 instance Traversable An where
   traverse f (An a) = An <$> f a
 
-data Box a = Box a
+data Box a = Box a deriving (Eq,Ord,Show,Read,Typeable,Data)
 
 instance Functor Box where
   fmap f (Box a) = Box (f a)

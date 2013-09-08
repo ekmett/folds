@@ -141,8 +141,6 @@ instance ArrowChoice L1 where
     step _ (Left c) = Left c
   {-# INLINE right #-}
 
-data SnocList1 a = Snoc1 (SnocList1 a) a | First a
-
 walk :: SnocList1 a -> L1 a b -> b
 walk xs0 (L1 k h z) = k (go xs0) where
   go (First a) = z a
