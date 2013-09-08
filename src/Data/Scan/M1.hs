@@ -8,6 +8,7 @@ import Control.Applicative
 import Control.Arrow
 import Control.Category
 import Control.Lens
+import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Functor.Apply
 import Data.Pointed
@@ -19,6 +20,19 @@ import Unsafe.Coerce
 
 -- | A semigroup reducer
 data M1 a b = forall m. M1 (m -> b) (a -> m) (m -> m -> m)
+
+instance Scanner M1 where
+  run1 a (M1 k h _) = k (h a)
+  prefix1 a (M1 k h m) = case h a of
+     x -> M1 (\y -> k (m x y)) h m
+  postfix1 (M1 k h m) a = case h a of
+     y -> M1 (\x -> k (m x y)) h m
+  interspersing a (M1 k h m) = M1 k h m' where
+    m' x y = x `m` h a `m` y
+  {-# INLINE run1 #-}
+  {-# INLINE prefix1 #-}
+  {-# INLINE postfix1 #-}
+  {-# INLINE interspersing #-}
 
 instance Functor (M1 a) where
   fmap f (M1 k h m) = M1 (f.k) h m
