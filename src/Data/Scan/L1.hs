@@ -8,6 +8,7 @@ import Control.Applicative
 import Control.Arrow
 import Control.Category
 import Control.Lens
+import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Functor.Apply
 import Data.Pointed
@@ -19,6 +20,16 @@ import Unsafe.Coerce
 
 -- | A Mealy Machine
 data L1 a b = forall c. L1 (c -> b) (c -> a -> c) (a -> c)
+
+instance Scanner L1 where
+  run1 a (L1 k _ z) = k (z a)
+  prefix1 a (L1 k h z) = L1 k h (h (z a))
+  postfix1 (L1 k h z) a = L1 (\c -> k (h c a)) h z
+  interspersing a (L1 k h z) = L1 k (\x b -> h (h x a) b) z
+  {-# INLINE run1 #-}
+  {-# INLINE prefix1 #-}
+  {-# INLINE postfix1 #-}
+  {-# INLINE interspersing #-}
 
 instance Functor (L1 a) where
   fmap f (L1 k h z) = L1 (f.k) h z
