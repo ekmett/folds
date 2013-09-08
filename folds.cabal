@@ -72,6 +72,7 @@ library
     Data.Fold.M
     Data.Fold.R
     Data.Scan.R1
+    Data.Scan.M1
     Data.Scan.L1
 
   ghc-options: -Wall

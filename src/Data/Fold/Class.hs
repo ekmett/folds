@@ -1,7 +1,9 @@
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE Trustworthy #-}
 module Data.Fold.Class
-  ( Folding(..)
+  ( Scanner(..)
+  , Folding(..)
   , beneath
   ) where
 
@@ -19,26 +21,37 @@ newtype One a = One a
 instance Foldable One where
   foldMap f (One a) = f a
 
-class Choice p => Folding p where
+class Choice p => Scanner p where
+  prefix1 :: a -> p a b -> p a b
+  default prefix1 :: Folding p => a -> p a b -> p a b
+  prefix1 = prefix . One
+  {-# INLINE prefix1 #-}
+
+  postfix1 :: p a b -> a -> p a b
+  default postfix1 :: Folding p => p a b -> a -> p a b
+  postfix1 p = postfix p . One
+  {-# INLINE postfix1 #-}
+
+  -- | Apply a 'Folding' to a single element of input
+  run1 :: a -> p a b -> b
+  default run1 :: Folding p => a -> p a b -> b
+  run1 = run . One
+  {-# INLINE run1 #-}
+
+  interspersing :: a -> p a b -> p a b
+
+class Scanner p => Folding p where
   -- | Partially apply a 'Folding' to some initial input on the left.
   --
   prefix :: Foldable t => t a -> p a b -> p a b
   prefix = prefixOf folded
   {-# INLINE prefix #-}
 
-  prefix1 :: a -> p a b -> p a b
-  prefix1 = prefix . One
-  {-# INLINE prefix1 #-}
-
   prefixOf :: Fold s a -> s -> p a b -> p a b
 
   postfix :: Foldable t => p a b -> t a -> p a b
   postfix = postfixOf folded
   {-# INLINE postfix #-}
-
-  postfix1 :: p a b -> a -> p a b
-  postfix1 p = postfix p . One
-  {-# INLINE postfix1 #-}
 
   postfixOf :: Fold s a -> p a b -> s -> p a b
 
@@ -53,18 +66,9 @@ class Choice p => Folding p where
   run = runOf folded
   {-# INLINE run #-}
 
-  -- | Apply a 'Folding' to a single element of input
-  run1 :: a -> p a b -> b
-  run1 = run . One
-  {-# INLINE run1 #-}
-
   runOf :: Fold s a -> s -> p a b -> b
 
   filtering :: (a -> Bool) -> p a b -> p a b
-
-  interspersing :: a -> p a b -> p a b
-
--- enscanOf :: Traversal s t a b -> s -> p a b -> t
 
 -- | Lift a 'Folding' into a 'Prism'.
 --

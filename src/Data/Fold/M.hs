@@ -29,46 +29,48 @@ import Prelude hiding (sum, product, length)
 -- | A 'foldMap' caught in amber. a.k.a. a monoidal reducer
 data M a b = forall m. M (m -> b) (a -> m) (m -> m -> m) m
 
+instance Scanner M where
+  run1 a (M k h _ _) = k (h a)
+  prefix1 a (M k h m z) = case h a of
+     x -> M (\y -> k (m x y)) h m z
+  postfix1 (M k h m z) a = case h a of
+     y -> M (\x -> k (m x y)) h m z
+  interspersing a (M k h m z) = M (maybe' (k z) k) h' m' Nothing' where
+    h' r  = Just' (h r)
+    m' (Just' x) (Just' y) = Just' (x `m` h a `m` y)
+    m' Nothing' my = my
+    m' mx Nothing' = mx
+  {-# INLINE run1 #-}
+  {-# INLINE prefix1 #-}
+  {-# INLINE postfix1 #-}
+  {-# INLINE interspersing #-}
+
 -- | efficient 'prefix', efficient 'postfix'
 instance Folding M where
   run s (M k h m (z :: m)) = reify (m, z) $
     \ (_ :: Proxy s) -> k $ runN (foldMap (N #. h) s :: N m s)
-  run1 a (M k h _ _) = k (h a)
   runOf l s (M k h m (z :: m)) = reify (m, z) $
     \ (_ :: Proxy s) -> k $ runN (foldMapOf l (N #. h) s :: N m s)
   prefix s (M k h m (z :: m)) = reify (m, z) $
     \ (_ :: Proxy s) -> case runN (foldMap (N #. h) s :: N m s) of
       x -> M (\y -> k (m x y)) h m z
-  prefix1 a (M k h m z) = case h a of
-     x -> M (\y -> k (m x y)) h m z
   prefixOf l s (M k h m (z :: m)) = reify (m, z) $
     \ (_ :: Proxy s) -> case runN (foldMapOf l (N #. h) s :: N m s) of
       x -> M (\y -> k (m x y)) h m z
   postfix (M k h m (z :: m)) s = reify (m, z) $
     \ (_ :: Proxy s) -> case runN (foldMap (N #. h) s :: N m s) of
       y -> M (\x -> k (m x y)) h m z
-  postfix1 (M k h m z) a = case h a of
-     y -> M (\x -> k (m x y)) h m z
   postfixOf l (M k h m (z :: m)) s = reify (m, z) $
     \ (_ :: Proxy s) -> case runN (foldMapOf l (N #. h) s :: N m s) of
       y -> M (\x -> k (m x y)) h m z
   filtering p (M k h m z) = M k (\a -> if p a then h a else z) m z
-  interspersing a (M k h m z) = M (maybe' (k z) k) h' m' Nothing' where
-    h' r  = Just' (h r)
-    m' (Just' x) (Just' y) = Just' (x `m` h a `m` y)
-    m' Nothing' my = my
-    m' mx Nothing' = mx
   {-# INLINE run #-}
-  {-# INLINE run1 #-}
   {-# INLINE runOf #-}
   {-# INLINE prefix #-}
-  {-# INLINE prefix1 #-}
   {-# INLINE prefixOf #-}
   {-# INLINE postfix #-}
-  {-# INLINE postfix1 #-}
   {-# INLINE postfixOf #-}
   {-# INLINE filtering #-}
-  {-# INLINE interspersing #-}
 
 instance Profunctor M where
   dimap f g (M k h m e) = M (g.k) (h.f) m e

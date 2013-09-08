@@ -23,32 +23,34 @@ import Prelude hiding (foldr, sum, product, length)
 -- | right folds / a reversed Moore machine
 data R a b = forall r. R (r -> b) (a -> r -> r) r
 
--- | leaky 'prefix', efficient 'postfix'
-instance Folding R where
-  run t (R k h z)     = k (foldr h z t)
+instance Scanner R where
   run1 t (R k h z)    = k (h t z)
-  runOf l s (R k h z) = k (foldrOf l h z s)
-  prefix s            = extend (run s)
   prefix1 a           = extend (run1 a)
-  prefixOf l s        = extend (runOf l s)
-  postfix t s         = run s (duplicate t)
   postfix1 t a        = run1 a (duplicate t)
-  postfixOf l t s     = runOf l s (duplicate t)
-  filtering p (R k h z) = R k (\a r -> if p a then h a r else r) z
   interspersing a (R k h z) = R (maybe' (k z) k) h' Nothing' where
     h' b Nothing'  = Just' (h b z)
     h' b (Just' x) = Just' (h b (h a x))
-  {-# INLINE run #-}
   {-# INLINE run1 #-}
+  {-# INLINE prefix1 #-}
+  {-# INLINE postfix1 #-}
+  {-# INLINE interspersing #-}
+
+-- | leaky 'prefix', efficient 'postfix'
+instance Folding R where
+  run t (R k h z)     = k (foldr h z t)
+  runOf l s (R k h z) = k (foldrOf l h z s)
+  prefix s            = extend (run s)
+  prefixOf l s        = extend (runOf l s)
+  postfix t s         = run s (duplicate t)
+  postfixOf l t s     = runOf l s (duplicate t)
+  filtering p (R k h z) = R k (\a r -> if p a then h a r else r) z
+  {-# INLINE run #-}
   {-# INLINE runOf #-}
   {-# INLINE prefix #-}
-  {-# INLINE prefix1 #-}
   {-# INLINE prefixOf #-}
   {-# INLINE postfix #-}
-  {-# INLINE postfix1 #-}
   {-# INLINE postfixOf #-}
   {-# INLINE filtering #-}
-  {-# INLINE interspersing #-}
 
 instance Profunctor R where
   dimap f g (R k h z) = R (g.k) (h.f) z

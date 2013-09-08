@@ -10,18 +10,31 @@
 ----------------------------------------------------------------------------
 module Data.Fold
   (
+  -- * Scaners and Foldings
+    Scanner(..)
+  , Folding(..)
+  -- * Combinators
+  , beneath
+  -- * Scanners
+  -- ** Left Scanners
+  , L1(..)
+  -- ** Semigroup Scanners
+  , M1(..)
+  -- ** Right Scanners
+  , R1(..)
   -- * Foldings
   -- ** Left Foldings
-    L(..), L'(..)
+  , L(..), L'(..)
   -- ** Monoidal Foldings
   , M(..)
   -- ** Right Foldings
   , R(..)
-  -- * Folding Combinators
-  , Folding(..)
-  , beneath
-  -- * Folding Homomorphisms
-  -- $hom
+  -- * Homomorphisms
+  -- ** Scanner Homomorphisms
+  -- $scannerhom
+
+  -- ** Folding Homomorphisms
+  -- $foldinghom
   , AsRM(..)
   , AsL'(..)
   ) where
@@ -31,17 +44,45 @@ import Data.Fold.L
 import Data.Fold.L'
 import Data.Fold.M
 import Data.Fold.R
+import Data.Scan.L1
+import Data.Scan.M1
+import Data.Scan.R1
 import Control.Category ((>>>))
 
--- * Folding Homomorphisms
+-- * Scanner Homomorphisma
 
--- $hom
+-- $scannerhom
 --
--- We define @f@ to be a folding homomorphism betwen @p@ and @q@ when:
+-- We define @f@ to be a scanner homomorphism between @p@ and @q@ when:
 --
 -- @
 -- f :: forall a b. p a b -> q a b
 -- @
+--
+-- @
+-- 'run1' xs (f φ)        ≡ 'run1' xs φ
+-- 'prefix1' xs (f φ)     ≡ f ('prefix1' xs φ)
+-- 'postfix1' (f φ) xs    ≡ f ('postfix1' φ xs)
+-- 'dimap' l r (f φ)      ≡ f ('dimap' l r φ)
+-- 'pure' a               ≡ f ('pure' a)
+-- f φ '<*>' f ψ          ≡ f (φ '<*>' ψ)
+-- 'return' a             ≡ f ('return' a)
+-- f φ '>>=' f . k        ≡ f (φ '>>=' k)
+-- 'interspersing' a (f φ) ≡ f ('interspersing' a φ)
+-- @
+--
+-- Furthermore,
+--
+-- @'left'' (f φ)@ and @f ('left'' φ)@ should agree whenever either answer is 'Right'
+-- @'right'' (f φ)@ and @f ('right'' φ)@ should agree whenver either answer is 'Left'
+-- @
+
+-- * Folding Homomorphisms
+
+-- $foldinghom
+--
+-- We define @f@ to be a folding homomorphism between @p@ and @q@ when
+-- @f@ is a scanner homomorphism and additionally we can satisfy:
 --
 -- @
 -- 'run' xs (f φ)         ≡ 'run' xs φ
@@ -50,19 +91,12 @@ import Control.Category ((>>>))
 -- 'prefixOf' l xs (f φ)  ≡ f ('prefixOf' l xs φ)
 -- 'postfix' (f φ) xs     ≡ f ('postfix' φ xs)
 -- 'postfixOf' l (f φ) xs ≡ f ('postfixOf' l φ xs)
--- 'left'' (f φ)          ≡ f ('left'' φ)
--- 'right'' (f φ)         ≡ f ('right'' φ)
--- 'dimap' l r (f φ)      ≡ f ('dimap' l r φ)
 -- 'extract' (f φ)        ≡ 'extract' φ
--- 'pure' a               ≡ f ('pure' a)
--- f φ '<*>' f ψ          ≡ f (φ '<*>' ψ)
--- 'return' a             ≡ f ('return' a)
--- f φ '>>=' f . k        ≡ f (φ '>>=' k)
 -- 'filtering' p (f φ)     ≡ f ('filtering' p φ)
--- 'interspersing' a (f φ) ≡ f ('interspersing' a φ)
 -- @
 --
--- Note: A law including 'extend' is explicitly excluded.
+-- Note: A law including 'extend' is explicitly excluded. To work consistenly
+-- across foldings, use 'prefix' and 'postfix' instead.
 
 class AsRM p where
   -- | 'asM' is a folding homomorphism to a monoidal folding

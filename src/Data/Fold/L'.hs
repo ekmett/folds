@@ -29,32 +29,35 @@ unfoldL' :: (s -> (b, a -> s)) -> s -> L' a b
 unfoldL' f = L' (fst . f) (snd . f)
 {-# INLINE unfoldL' #-}
 
--- | efficient 'prefix', leaky 'postfix'
-instance Folding L' where
-  run t (L' k h z)     = k $! foldl' h z t
+instance Scanner L' where
   run1 t (L' k h z)    = k $! h z t
-  runOf l s (L' k h z) = k $! foldlOf' l h z s
-  prefix s             = run s . duplicate
   prefix1 a            = run1 a . duplicate
-  prefixOf l s         = runOf l s . duplicate
-  postfix t s          = extend (run s) t
   postfix1 t a         = extend (run1 a) t
-  postfixOf l t s      = extend (runOf l s) t
-  filtering p (L' k h z) = L' k (\r a -> if p a then h r a else r) z
   interspersing a (L' k h z) = L' (maybe' (k z) k) h' Nothing' where
     h' Nothing' b  = Just' (h z b)
     h' (Just' x) b = Just' (h (h x a) b)
-  {-# INLINE run #-}
+
   {-# INLINE run1 #-}
+  {-# INLINE prefix1 #-}
+  {-# INLINE postfix1 #-}
+  {-# INLINE interspersing #-}
+
+-- | efficient 'prefix', leaky 'postfix'
+instance Folding L' where
+  run t (L' k h z)     = k $! foldl' h z t
+  runOf l s (L' k h z) = k $! foldlOf' l h z s
+  prefix s             = run s . duplicate
+  prefixOf l s         = runOf l s . duplicate
+  postfix t s          = extend (run s) t
+  postfixOf l t s      = extend (runOf l s) t
+  filtering p (L' k h z) = L' k (\r a -> if p a then h r a else r) z
+  {-# INLINE run #-}
   {-# INLINE runOf #-}
   {-# INLINE prefix #-}
-  {-# INLINE prefix1 #-}
   {-# INLINE prefixOf #-}
   {-# INLINE postfix #-}
-  {-# INLINE postfix1 #-}
   {-# INLINE postfixOf #-}
   {-# INLINE filtering #-}
-  {-# INLINE interspersing #-}
 
 instance Profunctor L' where
   dimap f g (L' k h z) = L' (g.k) (\r -> h r . f) z
