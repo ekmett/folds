@@ -6,10 +6,10 @@ module Data.Scan.R1
 import Control.Applicative
 import Control.Arrow
 import Control.Category
+import Control.Lens
 import Data.Fold.Internal
 import Data.Functor.Apply
 import Data.Pointed
-import Data.Profunctor
 import Data.Semigroupoid
 import Prelude hiding (id,(.))
 
@@ -76,3 +76,29 @@ instance Arrow R1 where
 instance Profunctor R1 where
   dimap f g (R1 k h z) = R1 (g.k) (h.f) (z.f)
   {-# INLINE dimap #-}
+
+instance Choice R1 where
+  left' (R1 k h z) = R1 (_Left %~ k) step (_Left %~ z) where
+    step (Left x) (Left y) = Left (h x y)
+    step (Right c) _ = Right c
+    step _ (Right c) = Right c
+  {-# INLINE left' #-}
+
+  right' (R1 k h z) = R1 (_Right %~ k) step (_Right %~ z) where
+    step (Right x) (Right y) = Right (h x y)
+    step (Left c) _ = Left c
+    step _ (Left c) = Left c
+  {-# INLINE right' #-}
+
+instance ArrowChoice R1 where
+  left (R1 k h z) = R1 (_Left %~ k) step (_Left %~ z) where
+    step (Left x) (Left y) = Left (h x y)
+    step (Right c) _ = Right c
+    step _ (Right c) = Right c
+  {-# INLINE left #-}
+
+  right (R1 k h z) = R1 (_Right %~ k) step (_Right %~ z) where
+    step (Right x) (Right y) = Right (h x y)
+    step (Left c) _ = Left c
+    step _ (Left c) = Left c
+  {-# INLINE right #-}
