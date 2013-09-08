@@ -1,4 +1,5 @@
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE Trustworthy #-}
 module Data.Scan.L1
   ( L1(..)
   ) where
@@ -10,8 +11,11 @@ import Control.Lens
 import Data.Fold.Internal
 import Data.Functor.Apply
 import Data.Pointed
+import Data.Profunctor
+import Data.Profunctor.Unsafe
 import Data.Semigroupoid
 import Prelude hiding (id,(.))
+import Unsafe.Coerce
 
 -- | A Mealy Machine
 data L1 a b = forall c. L1 (c -> b) (c -> a -> c) (a -> c)
@@ -77,6 +81,20 @@ instance Arrow L1 where
 instance Profunctor L1 where
   dimap f g (L1 k h z) = L1 (g.k) (\a -> h a . f) (z.f)
   {-# INLINE dimap #-}
+  lmap f (L1 k h z) = L1 (k) (\a -> h a . f) (z.f)
+  {-# INLINE lmap #-}
+  rmap g (L1 k h z) = L1 (g.k) h z
+  {-# INLINE rmap #-}
+  ( #. ) _ = unsafeCoerce
+  {-# INLINE (#.) #-}
+  x .# _ = unsafeCoerce x
+  {-# INLINE (.#) #-}
+
+instance Strong L1 where
+  first' = first
+  {-# INLINE first' #-}
+  second' = second
+  {-# INLINE second' #-}
 
 instance Choice L1 where
   left' (L1 k h z) = L1 (_Left %~ k) step (_Left %~ z) where
