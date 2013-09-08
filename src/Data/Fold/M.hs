@@ -133,8 +133,12 @@ instance Bind (M a) where
 instance Monad (M a) where
   return = pure
   {-# INLINE return #-}
+
   m >>= f = M (\xs a -> run xs (f a)) One Two Zero <*> m
   {-# INLINE (>>=) #-}
+
+  _ >> n = n
+  {-# INLINE (>>) #-}
 
 instance Extend (M a) where
   extended = extend

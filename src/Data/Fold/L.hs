@@ -129,8 +129,12 @@ instance Bind (L a) where
 instance Monad (L a) where
   return = pure
   {-# INLINE return #-}
+
   m >>= f = L (\xs a -> run xs (f a)) Snoc Nil <*> m
   {-# INLINE (>>=) #-}
+
+  _ >> n = n
+  {-# INLINE (>>) #-}
 
 instance Extend (L a) where
   extended = extend

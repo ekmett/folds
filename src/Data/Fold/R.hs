@@ -103,6 +103,9 @@ instance Monad (R a) where
   m >>= f = R (\xs a -> run xs (f a)) (:) [] <*> m
   {-# INLINE (>>=) #-}
 
+  _ >> n = n
+  {-# INLINE (>>) #-}
+
 instance Applicative (R a) where
   pure b = R (\() -> b) (\_ () -> ()) ()
   {-# INLINE pure #-}
