@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 module Data.Fold.Internal
   ( SnocList(..)
   , Maybe'(..), maybe'
@@ -10,6 +11,7 @@ module Data.Fold.Internal
   ) where
 
 import Control.Applicative
+import Data.Data
 import Data.Foldable
 import Data.Monoid
 import Data.Proxy
@@ -18,6 +20,7 @@ import Data.Traversable
 
 -- | Reversed '[]'
 data SnocList a = Snoc (SnocList a) a | Nil
+  deriving (Eq,Ord,Show,Read,Typeable,Data)
 
 instance Functor SnocList where
   fmap f (Snoc xs x) = Snoc (fmap f xs) (f x)
@@ -39,6 +42,7 @@ instance Traversable SnocList where
 
 -- | Strict 'Maybe'
 data Maybe' a = Nothing' | Just' !a
+  deriving (Eq,Ord,Show,Read,Typeable,Data)
 
 instance Foldable Maybe' where
   foldMap _ Nothing' = mempty
@@ -51,6 +55,7 @@ maybe' z _ Nothing'  = z
 
 -- | A reified 'Monoid'.
 newtype N a s = N { runN :: a }
+  deriving (Eq,Ord,Show,Read,Typeable,Data)
 
 instance Reifies s (a -> a -> a, a) => Monoid (N a s) where
   mempty = N $ snd $ reflect (Proxy :: Proxy s)
@@ -63,6 +68,7 @@ data Tree a
   = Zero
   | One a
   | Two (Tree a) (Tree a)
+  deriving (Eq,Ord,Show,Read,Typeable,Data)
 
 instance Functor Tree where
   fmap _ Zero = Zero
@@ -81,6 +87,7 @@ instance Traversable Tree where
 
 -- | Strict Pair
 data Pair' a b = Pair' !a !b
+  deriving (Eq,Ord,Show,Read,Typeable,Data)
 
 instance (Monoid a, Monoid b) => Monoid (Pair' a b) where
   mempty = Pair' mempty mempty
