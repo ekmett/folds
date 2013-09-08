@@ -1,6 +1,6 @@
 name:          folds
 category:      Data, Comonads, Enumerator
-version:       0.2
+version:       0.3
 license:       BSD3
 cabal-version: >= 1.8
 license-file:  LICENSE
@@ -70,6 +70,7 @@ library
     Data.Fold.L'
     Data.Fold.M
     Data.Fold.R
+    Data.Scan.R1
 
   ghc-options: -Wall
 
