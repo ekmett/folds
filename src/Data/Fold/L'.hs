@@ -21,7 +21,7 @@ import Data.Profunctor.Unsafe
 import Unsafe.Coerce
 import Prelude hiding (foldl)
 
--- | strict left folds
+-- | A strict left fold / strict Moore machine
 data L' a b = forall r. L' (r -> b) (r -> a -> r) r
 
 -- | Construct a strict Moore machine from a state valuation and transition function
