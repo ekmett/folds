@@ -17,7 +17,7 @@ module Data.Fold
   , beneath
   -- * Scans
   -- ** Left Scans
-  , L1(..)
+  , L1(..), L1'(..)
   -- ** Semigroup Scans
   , M1(..)
   -- ** Right Scans
@@ -43,6 +43,7 @@ import Data.Fold.Class
 import Data.Fold.L
 import Data.Fold.L'
 import Data.Fold.L1
+import Data.Fold.L1'
 import Data.Fold.M
 import Data.Fold.M1
 import Data.Fold.R

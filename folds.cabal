@@ -70,6 +70,7 @@ library
     Data.Fold.L
     Data.Fold.L'
     Data.Fold.L1
+    Data.Fold.L1'
     Data.Fold.M
     Data.Fold.M1
     Data.Fold.R
