@@ -1,3 +1,4 @@
+{-# LANGUAGE Trustworthy #-}
 {-# LANGUAGE ExistentialQuantification #-}
 module Data.Scan.R1
   ( R1(..)
@@ -10,8 +11,11 @@ import Control.Lens
 import Data.Fold.Internal
 import Data.Functor.Apply
 import Data.Pointed
+import Data.Profunctor
+import Data.Profunctor.Unsafe
 import Data.Semigroupoid
 import Prelude hiding (id,(.))
+import Unsafe.Coerce
 
 data R1 a b = forall c. R1 (c -> b) (a -> c -> c) (a -> c)
 
@@ -76,6 +80,20 @@ instance Arrow R1 where
 instance Profunctor R1 where
   dimap f g (R1 k h z) = R1 (g.k) (h.f) (z.f)
   {-# INLINE dimap #-}
+  lmap f (R1 k h z) = R1 (k) (h.f) (z.f)
+  {-# INLINE lmap #-}
+  rmap g (R1 k h z) = R1 (g.k) h z
+  {-# INLINE rmap #-}
+  ( #. ) _ = unsafeCoerce
+  {-# INLINE (#.) #-}
+  x .# _ = unsafeCoerce x
+  {-# INLINE (.#) #-}
+
+instance Strong R1 where
+  first' = first
+  {-# INLINE first' #-}
+  second' = second
+  {-# INLINE second' #-}
 
 instance Choice R1 where
   left' (R1 k h z) = R1 (_Left %~ k) step (_Left %~ z) where
