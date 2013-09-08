@@ -141,8 +141,6 @@ instance ArrowChoice R1 where
     step _ (Left c) = Left c
   {-# INLINE right #-}
 
-data List1 a = Cons1 a (List1 a) | Last a
-
 walk :: List1 a -> R1 a b -> b
 walk xs0 (R1 k h z) = k (go xs0) where
   go (Last a) = z a

@@ -5,6 +5,7 @@
 module Data.Fold.Internal
   ( SnocList(..)
   , SnocList1(..)
+  , List1(..)
   , Maybe'(..), maybe'
   , Pair'(..)
   , N(..)
@@ -16,7 +17,7 @@ module Data.Fold.Internal
 import Control.Applicative
 import Data.Data
 import Data.Foldable
-import Data.Monoid hiding (First)
+import Data.Monoid hiding (First, Last)
 import Data.Proxy
 import Data.Reflection
 import Data.Traversable
@@ -148,3 +149,29 @@ instance Foldable Box where
 instance Traversable Box where
   traverse f (Box a) = Box <$> f a
 
+data List1 a = Cons1 a (List1 a) | Last a
+
+instance Functor List1 where
+  fmap f (Cons1 a as) = Cons1 (f a) (fmap f as)
+  fmap f (Last a) = Last (f a)
+
+instance Foldable List1 where
+  foldMap f = go where
+    go (Cons1 a as) = f a `mappend` foldMap f as
+    go (Last a) = f a
+  {-# INLINE foldMap #-}
+
+  foldr f z = go where
+    go (Cons1 a as) = f a (go as)
+    go (Last a) = f a z
+  {-# INLINE foldr #-}
+
+  foldr1 f = go where
+    go (Cons1 a as) = f a (go as)
+    go (Last a)     = a
+  {-# INLINE foldr1 #-}
+
+instance Traversable List1 where
+  traverse f (Cons1 a as) = Cons1 <$> f a <*> traverse f as
+  traverse f (Last a) = Last <$> f a
+  {-# INLINABLE traverse #-}
