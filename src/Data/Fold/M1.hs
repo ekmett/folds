@@ -151,5 +151,3 @@ walk xs0 (M1 k h m) = k (go xs0) where
   go (Tip1 a) = h a
   go (Bin1 xs ys) = m (go xs) (go ys)
 {-# INLINE walk #-}
-
-
