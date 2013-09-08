@@ -58,6 +58,8 @@ import Control.Category ((>>>))
 -- f φ '<*>' f ψ          ≡ f (φ '<*>' ψ)
 -- 'return' a             ≡ f ('return' a)
 -- f φ '>>=' f . k        ≡ f (φ '>>=' k)
+-- 'filtering' p (f φ)     ≡ f ('filtering' p φ)
+-- 'interspersing' a (f φ) ≡ f ('interspersing' a φ)
 -- @
 --
 -- Note: A law including 'extend' is explicitly excluded.
@@ -79,6 +81,8 @@ class AsRM p where
   -- 'asM' φ '<*>' 'asM' ψ        ≡ 'asM' (φ '<*>' ψ)
   -- 'return' a                ≡ 'asM' ('return' a)
   -- 'asM' φ '>>=' 'asM' . k      ≡ 'asM' (φ '>>=' k)
+  -- 'filtering' p ('asM' φ)     ≡ 'asM' ('filtering' p φ)
+  -- 'interspersing' a ('asM' φ) ≡ 'asM' ('interspersing' a φ)
   -- @
   asM :: p a b -> M a b
   asM = asM . asR
@@ -99,6 +103,8 @@ class AsRM p where
   -- 'asR' φ '<*>' 'asR' ψ        ≡ 'asR' (φ '<*>' ψ)
   -- 'return' a                ≡ 'asR' ('return' a)
   -- 'asR' φ '>>=' 'asR' . k      ≡ 'asR' (φ '>>=' k)
+  -- 'filtering' p ('asR' φ)     ≡ 'asR' ('filtering' p φ)
+  -- 'interspersing' a ('asR' φ) ≡ 'asR' ('interspersing' a φ)
   -- @
   asR :: p a b -> R a b
   asR = asR . asM
@@ -139,6 +145,8 @@ class AsL' p where
   -- 'asL'' φ '<*>' 'asL'' ψ       ≡ 'asL'' (φ '<*>' ψ)
   -- 'return' a                 ≡ 'asL'' ('return' a)
   -- 'asL'' φ '>>=' 'asL'' . k     ≡ 'asL'' (φ '>>=' k)
+  -- 'filtering' p ('asL'' φ)     ≡ 'asL'' ('filtering' p φ)
+  -- 'interspersing' a ('asL'' φ) ≡ 'asL'' ('interspersing' a φ)
   -- @
   asL' :: p a b -> L' a b
 
