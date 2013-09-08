@@ -144,8 +144,6 @@ instance ArrowChoice M1 where
     step _ (Left c) = Left c
   {-# INLINE right #-}
 
-data Tree1 a = Bin1 (Tree1 a) (Tree1 a) | Tip1 a
-
 walk :: Tree1 a -> M1 a b -> b
 walk xs0 (M1 k h m) = k (go xs0) where
   go (Tip1 a) = h a

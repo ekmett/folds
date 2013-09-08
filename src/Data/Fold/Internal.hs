@@ -10,6 +10,7 @@ module Data.Fold.Internal
   , Pair'(..)
   , N(..)
   , Tree(..)
+  , Tree1(..)
   , An(..)
   , Box(..)
   ) where
@@ -175,3 +176,17 @@ instance Traversable List1 where
   traverse f (Cons1 a as) = Cons1 <$> f a <*> traverse f as
   traverse f (Last a) = Last <$> f a
   {-# INLINABLE traverse #-}
+
+data Tree1 a = Bin1 (Tree1 a) (Tree1 a) | Tip1 a
+
+instance Functor Tree1 where
+  fmap f (Bin1 as bs) = Bin1 (fmap f as) (fmap f bs)
+  fmap f (Tip1 a) = Tip1 (f a)
+
+instance Foldable Tree1 where
+  foldMap f (Bin1 as bs) = foldMap f as `mappend` foldMap f bs
+  foldMap f (Tip1 a) = f a
+
+instance Traversable Tree1 where
+  traverse f (Bin1 as bs) = Bin1 <$> traverse f as <*> traverse f bs
+  traverse f (Tip1 a) = Tip1 <$> f a
