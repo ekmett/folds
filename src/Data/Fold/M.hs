@@ -52,16 +52,23 @@ instance Folding M where
   postfixOf l (M k h m (z :: m)) s = reify (m, z) $
     \ (_ :: Proxy s) -> case runN (foldMapOf l (N #. h) s :: N m s) of
       y -> M (\x -> k (m x y)) h m z
-
-instance Filtering M where
   filtering p (M k h m z) = M k (\a -> if p a then h a else z) m z
-
-instance Interspersing M where
   interspersing a (M k h m z) = M (maybe' (k z) k) h' m' Nothing' where
     h' r  = Just' (h r)
     m' (Just' x) (Just' y) = Just' (x `m` h a `m` y)
     m' Nothing' my = my
     m' mx Nothing' = mx
+  {-# INLINE run #-}
+  {-# INLINE run1 #-}
+  {-# INLINE runOf #-}
+  {-# INLINE prefix #-}
+  {-# INLINE prefix1 #-}
+  {-# INLINE prefixOf #-}
+  {-# INLINE postfix #-}
+  {-# INLINE postfix1 #-}
+  {-# INLINE postfixOf #-}
+  {-# INLINE filtering #-}
+  {-# INLINE interspersing #-}
 
 instance Profunctor M where
   dimap f g (M k h m e) = M (g.k) (h.f) m e

@@ -2,8 +2,6 @@
 {-# LANGUAGE Trustworthy #-}
 module Data.Fold.Class
   ( Folding(..)
-  , Filtering(..)
-  , Interspersing(..)
   , beneath
   ) where
 
@@ -52,6 +50,9 @@ class Choice p => Folding p where
 
   runOf :: Fold s a -> s -> p a b -> b
 
+  filtering :: (a -> Bool) -> p a b -> p a b
+  interspersing :: a -> p a b -> p a b
+
 -- enscanOf :: Traversal s t a b -> s -> p a b -> t
 
 -- | Lift a 'Folding' into a 'Prism'.
@@ -74,9 +75,3 @@ class Choice p => Folding p where
 -- @
 beneath :: Profunctor p => Overloaded p Mutator s t a b -> p a b -> p s t
 beneath l f = runMutator #. l (Mutator #. f)
-
-class Folding p => Filtering p where
-  filtering :: (a -> Bool) -> p a b -> p a b
-
-class Folding p => Interspersing p where
-  interspersing :: a -> p a b -> p a b

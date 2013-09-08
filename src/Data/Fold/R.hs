@@ -34,15 +34,20 @@ instance Folding R where
   postfix t s         = run s (duplicate t)
   postfix1 t a        = run1 a (duplicate t)
   postfixOf l t s     = runOf l s (duplicate t)
-
-instance Filtering R where
   filtering p (R k h z) = R k (\a r -> if p a then h a r else r) z
-  {-# INLINE filtering #-}
-
-instance Interspersing R where
   interspersing a (R k h z) = R (maybe' (k z) k) h' Nothing' where
     h' b Nothing'  = Just' (h b z)
     h' b (Just' x) = Just' (h b (h a x))
+  {-# INLINE run #-}
+  {-# INLINE run1 #-}
+  {-# INLINE runOf #-}
+  {-# INLINE prefix #-}
+  {-# INLINE prefix1 #-}
+  {-# INLINE prefixOf #-}
+  {-# INLINE postfix #-}
+  {-# INLINE postfix1 #-}
+  {-# INLINE postfixOf #-}
+  {-# INLINE filtering #-}
   {-# INLINE interspersing #-}
 
 instance Profunctor R where

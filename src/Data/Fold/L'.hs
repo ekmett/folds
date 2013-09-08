@@ -34,14 +34,21 @@ instance Folding L' where
   postfix t s          = extend (run s) t
   postfix1 t a         = extend (run1 a) t
   postfixOf l t s      = extend (runOf l s) t
-
-instance Filtering L' where
   filtering p (L' k h z) = L' k (\r a -> if p a then h r a else r) z
-
-instance Interspersing L' where
   interspersing a (L' k h z) = L' (maybe' (k z) k) h' Nothing' where
     h' Nothing' b  = Just' (h z b)
     h' (Just' x) b = Just' (h (h x a) b)
+  {-# INLINE run #-}
+  {-# INLINE run1 #-}
+  {-# INLINE runOf #-}
+  {-# INLINE prefix #-}
+  {-# INLINE prefix1 #-}
+  {-# INLINE prefixOf #-}
+  {-# INLINE postfix #-}
+  {-# INLINE postfix1 #-}
+  {-# INLINE postfixOf #-}
+  {-# INLINE filtering #-}
+  {-# INLINE interspersing #-}
 
 instance Profunctor L' where
   dimap f g (L' k h z) = L' (g.k) (\r -> h r . f) z
