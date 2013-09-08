@@ -81,7 +81,8 @@ import Control.Category ((>>>))
 -- Furthermore,
 --
 -- @'left'' (f φ)@ and @f ('left'' φ)@ should agree whenever either answer is 'Right'
--- @'right'' (f φ)@ and @f ('right'' φ)@ should agree whenver either answer is 'Left'
+--
+-- @'right'' (f φ)@ and @f ('right'' φ)@ should agree whenever either answer is 'Left'
 --
 
 -- * Folding Homomorphisms
