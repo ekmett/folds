@@ -54,12 +54,13 @@ import Control.Category ((>>>))
 -- 'right'' (f φ)         ≡ f ('right'' φ)
 -- 'dimap' l r (f φ)      ≡ f ('dimap' l r φ)
 -- 'extract' (f φ)        ≡ 'extract' φ
--- 'extend' h (f φ)       ≡ f ('extend' (h . f) φ)
 -- 'pure' a               ≡ f ('pure' a)
 -- f φ '<*>' f ψ          ≡ f (φ '<*>' ψ)
 -- 'return' a             ≡ f ('return' a)
 -- f φ '>>=' f . k        ≡ f (φ '>>=' k)
 -- @
+--
+-- Note: A law including 'extend' is explicitly excluded.
 
 class AsRM p where
   -- | 'asM' is a folding homomorphism to a monoidal folding
@@ -74,7 +75,6 @@ class AsRM p where
   -- 'right'' ('asM' φ)         ≡ 'asM' ('right'' φ)
   -- 'dimap' l r ('asM' φ)      ≡ 'asM' ('dimap' l r φ)
   -- 'extract' ('asM' φ)        ≡ 'extract' φ
-  -- 'extend' h ('asM' φ)       ≡ 'asM' ('extend' (h . 'asM') φ)
   -- 'pure' a                  ≡ 'asM' ('pure' a)
   -- 'asM' φ '<*>' 'asM' ψ        ≡ 'asM' (φ '<*>' ψ)
   -- 'return' a                ≡ 'asM' ('return' a)
@@ -95,7 +95,6 @@ class AsRM p where
   -- 'right'' ('asR' φ)         ≡ 'asR' ('right'' φ)
   -- 'dimap' l r ('asR' φ)      ≡ 'asR' ('dimap' l r φ)
   -- 'extract' ('asR' φ)        ≡ 'extract' φ
-  -- 'extend' h ('asR' φ)       ≡ 'asR' ('extend' (h . 'asR') φ)
   -- 'pure' a                  ≡ 'asR' ('pure' a)
   -- 'asR' φ '<*>' 'asR' ψ        ≡ 'asR' (φ '<*>' ψ)
   -- 'return' a                ≡ 'asR' ('return' a)
@@ -136,7 +135,6 @@ class AsL' p where
   -- 'right'' ('asL'' φ)         ≡ 'asL'' ('right'' φ)
   -- 'dimap' l r ('asL'' φ)      ≡ 'asL'' ('dimap' l r φ)
   -- 'extract' ('asL'' φ)        ≡ 'extract' φ
-  -- 'extend' h ('asL'' φ)       ≡ 'asL'' ('extend' (h . 'asL'') φ)
   -- 'pure' a                   ≡ 'asL'' ('pure' a)
   -- 'asL'' φ '<*>' 'asL'' ψ       ≡ 'asL'' (φ '<*>' ψ)
   -- 'return' a                 ≡ 'asL'' ('return' a)
