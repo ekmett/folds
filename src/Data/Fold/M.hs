@@ -26,7 +26,7 @@ import Data.Reflection
 import Unsafe.Coerce
 import Prelude hiding (sum, product, length)
 
--- | A 'foldMap' caught in amber.
+-- | A 'foldMap' caught in amber. a.k.a. a monoidal reducer
 data M a b = forall m. M (m -> b) (a -> m) (m -> m -> m) m
 
 -- | efficient 'prefix', efficient 'postfix'
