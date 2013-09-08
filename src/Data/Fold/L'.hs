@@ -35,6 +35,9 @@ instance Folding L' where
   postfix1 t a         = extend (run1 a) t
   postfixOf l t s      = extend (runOf l s) t
 
+instance Filtering L' where
+  filtering p (L' k h z) = L' k (\r a -> if p a then h r a else r) z
+
 instance Profunctor L' where
   dimap f g (L' k h z) = L' (g.k) (\r -> h r . f) z
   {-# INLINE dimap #-}

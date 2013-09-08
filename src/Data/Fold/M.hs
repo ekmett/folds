@@ -53,6 +53,9 @@ instance Folding M where
     \ (_ :: Proxy s) -> case runN (foldMapOf l (N #. h) s :: N m s) of
       y -> M (\x -> k (m x y)) h m z
 
+instance Filtering M where
+  filtering p (M k h m z) = M k (\a -> if p a then h a else z) m z
+
 instance Profunctor M where
   dimap f g (M k h m e) = M (g.k) (h.f) m e
   {-# INLINE dimap #-}

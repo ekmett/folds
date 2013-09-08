@@ -2,6 +2,7 @@
 {-# LANGUAGE Trustworthy #-}
 module Data.Fold.Class
   ( Folding(..)
+  , Filtering(..)
   , beneath
   ) where
 
@@ -72,3 +73,6 @@ class Choice p => Folding p where
 -- @
 beneath :: Profunctor p => Overloaded p Mutator s t a b -> p a b -> p s t
 beneath l f = runMutator #. l (Mutator #. f)
+
+class Folding p => Filtering p where
+  filtering :: (a -> Bool) -> p a b -> p a b

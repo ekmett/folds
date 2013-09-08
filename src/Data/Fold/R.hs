@@ -35,6 +35,9 @@ instance Folding R where
   postfix1 t a        = run1 a (duplicate t)
   postfixOf l t s     = runOf l s (duplicate t)
 
+instance Filtering R where
+  filtering p (R k h z) = R k (\a r -> if p a then h a r else r) z
+
 instance Profunctor R where
   dimap f g (R k h z) = R (g.k) (h.f) z
   {-# INLINE dimap #-}
