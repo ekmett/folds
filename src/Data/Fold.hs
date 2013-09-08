@@ -114,6 +114,34 @@ class AsRM1 p where
   asR1 :: p a b -> R1 a b
   asR1 = asR1.asM1
 
+instance AsRM1 L where
+  asM1 (L k h z) = M1 (\f -> k (f z)) (flip h) (>>>)
+
+instance AsRM1 L' where
+  asR1 (L' k h z) = R1 (\f -> k (f z)) (\b g x -> g $! h x b) (\a x -> h x a)
+
+instance AsRM1 L1 where
+  asM1 (L1 k h z) = M1 (\(Pair' _ r) -> k r) (\a -> Pair' (`h` a) (z a)) (\(Pair' r2r' r') (Pair' r2r _) -> Pair' (r2r.r2r') (r2r r'))
+
+instance AsRM1 L1' where
+  asM1 (L1' k h z) = M1 (\(Pair' _ r) -> k r) (\a -> Pair' (`h` a) (z a)) (\(Pair' r2r' r') (Pair' r2r _) -> Pair' (\r -> r2r $! r2r' r) (r2r r'))
+
+instance AsRM1 M where
+  asM1 (M k h m _) = M1 k h m
+  asR1 (M k h m _) = R1 k (m.h) h
+
+instance AsRM1 M1 where
+  asM1 = id
+  asR1 (M1 k h m) = R1 k (m.h) h
+
+instance AsRM1 R where
+  asM1 (R k h z) = M1 (\f -> k (f z)) h (.)
+  asR1 (R k h z) = R1 k h (\a -> h a z)
+
+instance AsRM1 R1 where
+  asM1 (R1 k h z) = M1 (\(Pair' _ r) -> k r) (\a -> Pair' (h a) (z a)) (\(Pair' r2r _) (Pair' r2r' r') -> Pair' (r2r.r2r') (r2r r'))
+  asR1 = id
+
 class AsRM1 p => AsRM p where
   -- | 'asM' is a folding homomorphism to a monoidal folding
   --
@@ -159,49 +187,26 @@ class AsRM1 p => AsRM p where
   asR :: p a b -> R a b
   asR = asR . asM
 
-instance AsRM1 R1 where
-  asM1 (R1 k h z) = M1 (\(Pair' _ r) -> k r) (\a -> Pair' (h a) (z a)) (\(Pair' r2r _) (Pair' r2r' r') -> Pair' (r2r.r2r') (r2r r'))
-  asR1 = id
-
-instance AsRM1 M1 where
-  asM1 = id
-  asR1 (M1 k h m) = R1 k (m.h) h
-
-instance AsRM1 R where
-  asM1 (R k h z) = M1 (\f -> k (f z)) h (.)
-  asR1 (R k h z) = R1 k h (\a -> h a z)
-
 -- | We can convert from a lazy right fold to a monoidal fold
 instance AsRM R where
   asM (R k h z) = M (\f -> k (f z)) h (.) id
   asR = id
-
-instance AsRM1 M where
-  asM1 (M k h m _) = M1 k h m
-  asR1 (M k h m _) = R1 k (m.h) h
 
 -- | We can convert from a monoidal fold to a lazy right fold
 instance AsRM M where
   asR (M k h m z) = R k (m.h) z
   asM = id
 
-instance AsRM1 L where
-  asM1 (L k h z) = M1 (\f -> k (f z)) (flip h) (>>>)
-  -- asR1 (L h k z) = R1 (\f -> k (f z)) (\b g x -> g (h x b)) (\a x -> h x a)
-
 -- | We can convert from a lazy left folding to a right or monoidal fold
 instance AsRM L where
   asM (L k h z) = M (\f -> k (f z)) (flip h) (>>>) id
   asR (L k h z) = R (\f -> k (f z)) (\b g x -> g (h x b)) id
 
-instance AsRM1 L' where
-  asR1 (L' k h z) = R1 (\f -> k (f z)) (\b g x -> g $! h x b) (\a x -> h x a)
-
 -- | We can convert from a strict left folding to a right or monoidal fold
 instance AsRM L' where
   asR (L' k h z) = R (\f -> k (f z)) (\b g x -> g $! h x b) id
 
-class AsL1' p where
+class AsRM1 p => AsL1' p where
   -- | Scan homomorphism to a strict Mealy machine
   asL1' :: p a b -> L1' a b
   default asL1' :: AsL' p => p a b -> L1' a b
@@ -219,7 +224,7 @@ instance AsL1' L where
 instance AsL1' L' where
   asL1' (L' k h z) = L1' k h (h z)
 
-class AsL1' p => AsL' p where
+class (AsRM p, AsL1' p) => AsL' p where
   -- | 'asL'' is a folding homomorphism to a strict left folding
   --
   -- @
