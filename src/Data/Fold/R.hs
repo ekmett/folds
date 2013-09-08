@@ -37,6 +37,13 @@ instance Folding R where
 
 instance Filtering R where
   filtering p (R k h z) = R k (\a r -> if p a then h a r else r) z
+  {-# INLINE filtering #-}
+
+instance Interspersing R where
+  interspersing a (R k h z) = R (maybe' (k z) k) h' Nothing' where
+    h' b Nothing'  = Just' (h b z)
+    h' b (Just' x) = Just' (h b (h a x))
+  {-# INLINE interspersing #-}
 
 instance Profunctor R where
   dimap f g (R k h z) = R (g.k) (h.f) z
