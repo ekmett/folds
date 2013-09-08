@@ -17,6 +17,7 @@ import Data.Semigroupoid
 import Prelude hiding (id,(.))
 import Unsafe.Coerce
 
+-- | A reversed Mealy machine
 data R1 a b = forall c. R1 (c -> b) (a -> c -> c) (a -> c)
 
 instance Functor (R1 a) where
@@ -48,6 +49,14 @@ instance Applicative (R1 a) where
   {-# INLINE (<*) #-}
   _ *> m = m
   {-# INLINE (*>) #-}
+
+instance Monad (R1 a) where
+  return x = R1 (\() -> x) (\_ () -> ()) (\_ -> ())
+  {-# INLINE return #-}
+  m >>= f = R1 (\xs a -> walk xs (f a)) Cons1 Last <*> m where
+  {-# INLINE (>>=) #-}
+  _ >> n = n
+  {-# INLINE (>>) #-}
 
 instance Semigroupoid R1 where
   o = (.)
@@ -120,3 +129,11 @@ instance ArrowChoice R1 where
     step (Left c) _ = Left c
     step _ (Left c) = Left c
   {-# INLINE right #-}
+
+data List1 a = Cons1 a (List1 a) | Last a
+
+walk :: List1 a -> R1 a b -> b
+walk xs0 (R1 k h z) = k (go xs0) where
+  go (Last a) = z a
+  go (Cons1 a as) = h a (go as)
+{-# INLINE walk #-}

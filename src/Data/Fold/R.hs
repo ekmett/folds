@@ -20,7 +20,7 @@ import Data.Profunctor.Unsafe
 import Unsafe.Coerce
 import Prelude hiding (foldr, sum, product, length)
 
--- right folds
+-- | right folds / a reversed Moore machine
 data R a b = forall r. R (r -> b) (a -> r -> r) r
 
 -- | leaky 'prefix', efficient 'postfix'
