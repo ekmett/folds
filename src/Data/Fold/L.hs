@@ -29,7 +29,7 @@ unfoldL :: (s -> (b, a -> s)) -> s -> L a b
 unfoldL f = L (fst . f) (snd . f)
 {-# INLINE unfoldL #-}
 
-instance Scanner L where
+instance Scan L where
   run1 t (L k h z)    = k (h z t)
   prefix1 a           = run1 a . duplicate
   postfix1 t a        = extend (run1 a) t

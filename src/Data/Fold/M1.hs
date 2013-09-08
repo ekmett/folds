@@ -1,6 +1,6 @@
 {-# LANGUAGE Trustworthy #-}
 {-# LANGUAGE ExistentialQuantification #-}
-module Data.Scan.M1
+module Data.Fold.M1
   ( M1(..)
   ) where
 
@@ -21,7 +21,7 @@ import Unsafe.Coerce
 -- | A semigroup reducer
 data M1 a b = forall m. M1 (m -> b) (a -> m) (m -> m -> m)
 
-instance Scanner M1 where
+instance Scan M1 where
   run1 a (M1 k h _) = k (h a)
   prefix1 a (M1 k h m) = case h a of
      x -> M1 (\y -> k (m x y)) h m

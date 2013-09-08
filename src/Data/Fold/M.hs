@@ -29,7 +29,7 @@ import Prelude hiding (sum, product, length)
 -- | A 'foldMap' caught in amber. a.k.a. a monoidal reducer
 data M a b = forall m. M (m -> b) (a -> m) (m -> m -> m) m
 
-instance Scanner M where
+instance Scan M where
   run1 a (M k h _ _) = k (h a)
   prefix1 a (M k h m z) = case h a of
      x -> M (\y -> k (m x y)) h m z

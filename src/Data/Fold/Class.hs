@@ -2,7 +2,7 @@
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE Trustworthy #-}
 module Data.Fold.Class
-  ( Scanner(..)
+  ( Scan(..)
   , Folding(..)
   , beneath
   ) where
@@ -21,7 +21,7 @@ newtype One a = One a
 instance Foldable One where
   foldMap f (One a) = f a
 
-class Choice p => Scanner p where
+class Choice p => Scan p where
   prefix1 :: a -> p a b -> p a b
   default prefix1 :: Folding p => a -> p a b -> p a b
   prefix1 = prefix . One
@@ -40,7 +40,7 @@ class Choice p => Scanner p where
 
   interspersing :: a -> p a b -> p a b
 
-class Scanner p => Folding p where
+class Scan p => Folding p where
   -- | Partially apply a 'Folding' to some initial input on the left.
   --
   prefix :: Foldable t => t a -> p a b -> p a b

@@ -11,16 +11,16 @@
 module Data.Fold
   (
   -- * Scaners and Foldings
-    Scanner(..)
+    Scan(..)
   , Folding(..)
   -- * Combinators
   , beneath
-  -- * Scanners
-  -- ** Left Scanners
+  -- * Scans
+  -- ** Left Scans
   , L1(..)
-  -- ** Semigroup Scanners
+  -- ** Semigroup Scans
   , M1(..)
-  -- ** Right Scanners
+  -- ** Right Scans
   , R1(..)
   -- * Foldings
   -- ** Left Foldings
@@ -30,8 +30,8 @@ module Data.Fold
   -- ** Right Foldings
   , R(..)
   -- * Homomorphisms
-  -- ** Scanner Homomorphisms
-  -- $scannerhom
+  -- ** Scan Homomorphisms
+  -- $scanhom
 
   -- ** Folding Homomorphisms
   -- $foldinghom
@@ -42,18 +42,18 @@ module Data.Fold
 import Data.Fold.Class
 import Data.Fold.L
 import Data.Fold.L'
+import Data.Fold.L1
 import Data.Fold.M
+import Data.Fold.M1
 import Data.Fold.R
-import Data.Scan.L1
-import Data.Scan.M1
-import Data.Scan.R1
+import Data.Fold.R1
 import Control.Category ((>>>))
 
--- * Scanner Homomorphisma
+-- * Scan Homomorphisms
 
--- $scannerhom
+-- $scanhom
 --
--- We define @f@ to be a scanner homomorphism between @p@ and @q@ when:
+-- We define @f@ to be a scan homomorphism between @p@ and @q@ when:
 --
 -- @
 -- f :: forall a b. p a b -> q a b
@@ -75,14 +75,14 @@ import Control.Category ((>>>))
 --
 -- @'left'' (f φ)@ and @f ('left'' φ)@ should agree whenever either answer is 'Right'
 -- @'right'' (f φ)@ and @f ('right'' φ)@ should agree whenver either answer is 'Left'
--- @
+--
 
 -- * Folding Homomorphisms
 
 -- $foldinghom
 --
 -- We define @f@ to be a folding homomorphism between @p@ and @q@ when
--- @f@ is a scanner homomorphism and additionally we can satisfy:
+-- @f@ is a scan homomorphism and additionally we can satisfy:
 --
 -- @
 -- 'run' xs (f φ)         ≡ 'run' xs φ

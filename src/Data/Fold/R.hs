@@ -23,7 +23,7 @@ import Prelude hiding (foldr, sum, product, length)
 -- | right folds / a reversed Moore machine
 data R a b = forall r. R (r -> b) (a -> r -> r) r
 
-instance Scanner R where
+instance Scan R where
   run1 t (R k h z)    = k (h t z)
   prefix1 a           = extend (run1 a)
   postfix1 t a        = run1 a (duplicate t)
