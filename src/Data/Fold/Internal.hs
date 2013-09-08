@@ -19,6 +19,10 @@ import Data.Traversable
 -- | Reversed '[]'
 data SnocList a = Snoc (SnocList a) a | Nil
 
+instance Functor SnocList where
+  fmap f (Snoc xs x) = Snoc (fmap f xs) (f x)
+  fmap _ Nil = Nil
+
 instance Foldable SnocList where
   foldl f z m0 = go m0 where
     go (Snoc xs x) = f (go xs) x
@@ -28,8 +32,17 @@ instance Foldable SnocList where
   foldMap _ Nil = mempty
   {-# INLINE foldMap #-}
 
+instance Traversable SnocList where
+  traverse f (Snoc xs x) = Snoc <$> traverse f xs <*> f x
+  traverse _ Nil = pure Nil
+  {-# INLINE traverse #-}
+
 -- | Strict 'Maybe'
 data Maybe' a = Nothing' | Just' !a
+
+instance Foldable Maybe' where
+  foldMap _ Nothing' = mempty
+  foldMap f (Just' a) = f a
 
 maybe' :: b -> (a -> b) -> Maybe' a -> b
 maybe' _ f (Just' a) = f a
@@ -68,3 +81,9 @@ instance Traversable Tree where
 
 -- | Strict Pair
 data Pair' a b = Pair' !a !b
+
+instance (Monoid a, Monoid b) => Monoid (Pair' a b) where
+  mempty = Pair' mempty mempty
+  {-# INLINE mempty #-}
+  mappend (Pair' a b) (Pair' c d) = Pair' (mappend a c) (mappend b d)
+  {-# INLINE mappend #-}

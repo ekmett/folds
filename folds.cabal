@@ -65,6 +65,7 @@ library
   exposed-modules:
     Data.Fold
     Data.Fold.Class
+    Data.Fold.Internal
     Data.Fold.L
     Data.Fold.L'
     Data.Fold.M
