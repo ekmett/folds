@@ -8,6 +8,8 @@ module Data.Fold.Internal
   , Pair'(..)
   , N(..)
   , Tree(..)
+  , An(..)
+  , Box(..)
   ) where
 
 import Control.Applicative
@@ -94,3 +96,26 @@ instance (Monoid a, Monoid b) => Monoid (Pair' a b) where
   {-# INLINE mempty #-}
   mappend (Pair' a b) (Pair' c d) = Pair' (mappend a c) (mappend b d)
   {-# INLINE mappend #-}
+
+newtype An a = An a
+
+instance Functor An where
+  fmap f (An a) = An (f a)
+
+instance Foldable An where
+  foldMap f (An a) = f a
+
+instance Traversable An where
+  traverse f (An a) = An <$> f a
+
+data Box a = Box a
+
+instance Functor Box where
+  fmap f (Box a) = Box (f a)
+
+instance Foldable Box where
+  foldMap f (Box a) = f a
+
+instance Traversable Box where
+  traverse f (Box a) = Box <$> f a
+

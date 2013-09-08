@@ -253,5 +253,3 @@ instance AsL' L' where
 -- | We can convert from a lazy left folding to a strict left folding.
 instance AsL' L where
   asL' (L k h z) = L' (\(Box r) -> k r) (\(Box r) a -> Box (h r a)) (Box z)
-
-data Box a = Box a

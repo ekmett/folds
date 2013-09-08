@@ -10,32 +10,28 @@ module Data.Fold.Class
 import Control.Lens
 import Control.Lens.Internal.Setter
 import Data.Foldable
+import Data.Fold.Internal
 import Data.Profunctor.Unsafe
 
 --
 -- $setup
 -- >>> import Data.Fold
 
-newtype One a = One a
-
-instance Foldable One where
-  foldMap f (One a) = f a
-
 class Choice p => Scan p where
   prefix1 :: a -> p a b -> p a b
   default prefix1 :: Folding p => a -> p a b -> p a b
-  prefix1 = prefix . One
+  prefix1 = prefix . An
   {-# INLINE prefix1 #-}
 
   postfix1 :: p a b -> a -> p a b
   default postfix1 :: Folding p => p a b -> a -> p a b
-  postfix1 p = postfix p . One
+  postfix1 p = postfix p . An
   {-# INLINE postfix1 #-}
 
   -- | Apply a 'Folding' to a single element of input
   run1 :: a -> p a b -> b
   default run1 :: Folding p => a -> p a b -> b
-  run1 = run . One
+  run1 = run . An
   {-# INLINE run1 #-}
 
   interspersing :: a -> p a b -> p a b
