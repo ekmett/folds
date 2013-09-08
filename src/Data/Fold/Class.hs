@@ -20,6 +20,8 @@ instance Foldable One where
   foldMap f (One a) = f a
 
 class Choice p => Folding p where
+  -- | Partially apply a 'Folding' to some initial input on the left.
+  --
   prefix :: Foldable t => t a -> p a b -> p a b
   prefix = prefixOf folded
   {-# INLINE prefix #-}
@@ -40,10 +42,18 @@ class Choice p => Folding p where
 
   postfixOf :: Fold s a -> p a b -> s -> p a b
 
+  -- | Apply a 'Folding' to a container full of input:
+  --
+  -- >>> run ["hello","world"] $ L id (++) []
+  -- "helloworld"
+  --
+  -- >>> run [1,2,3] $ L id (+) 0
+  -- 6
   run :: Foldable t => t a -> p a b -> b
   run = runOf folded
   {-# INLINE run #-}
 
+  -- | Apply a 'Folding' to a single element of input
   run1 :: a -> p a b -> b
   run1 = run . One
   {-# INLINE run1 #-}
@@ -51,6 +61,7 @@ class Choice p => Folding p where
   runOf :: Fold s a -> s -> p a b -> b
 
   filtering :: (a -> Bool) -> p a b -> p a b
+
   interspersing :: a -> p a b -> p a b
 
 -- enscanOf :: Traversal s t a b -> s -> p a b -> t
