@@ -29,7 +29,7 @@
 <a name="line-20"></a><span class='hs-keyword'>import</span> <span class='hs-conid'>Unsafe</span><span class='hs-varop'>.</span><span class='hs-conid'>Coerce</span>
 <a name="line-21"></a><span class='hs-keyword'>import</span> <span class='hs-conid'>Prelude</span> <span class='hs-varid'>hiding</span> <span class='hs-layout'>(</span><span class='hs-varid'>foldr</span><span class='hs-layout'>,</span> <span class='hs-varid'>sum</span><span class='hs-layout'>,</span> <span class='hs-varid'>product</span><span class='hs-layout'>,</span> <span class='hs-varid'>length</span><span class='hs-layout'>)</span>
 <a name="line-22"></a>
-<a name="line-23"></a><a name="R"></a><span class='hs-comment'>-- right folds</span>
+<a name="line-23"></a><a name="R"></a><span class='hs-comment'>-- | right folds / a reversed Moore machine</span>
 <a name="line-24"></a><a name="R"></a><span class='hs-keyword'>data</span> <span class='hs-conid'>R</span> <span class='hs-varid'>a</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>=</span> <span class='hs-keyword'>forall</span> <span class='hs-varid'>r</span><span class='hs-varop'>.</span> <span class='hs-conid'>R</span> <span class='hs-layout'>(</span><span class='hs-varid'>r</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>b</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>r</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>r</span><span class='hs-layout'>)</span> <span class='hs-varid'>r</span>
 <a name="line-25"></a>
 <a name="line-26"></a><a name="instance%20Folding%20R"></a><span class='hs-comment'>-- | leaky 'prefix', efficient 'postfix'</span>
@@ -112,47 +112,50 @@
 <a name="line-103"></a>  <span class='hs-varid'>m</span> <span class='hs-varop'>&gt;&gt;=</span> <span class='hs-varid'>f</span> <span class='hs-keyglyph'>=</span> <span class='hs-conid'>R</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span><span class='hs-varid'>xs</span> <span class='hs-varid'>a</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>run</span> <span class='hs-varid'>xs</span> <span class='hs-layout'>(</span><span class='hs-varid'>f</span> <span class='hs-varid'>a</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-conop'>:</span><span class='hs-layout'>)</span> <span class='hs-conid'>[]</span> <span class='hs-varop'>&lt;*&gt;</span> <span class='hs-varid'>m</span>
 <a name="line-104"></a>  <span class='hs-comment'>{-# INLINE (&gt;&gt;=) #-}</span>
 <a name="line-105"></a>
-<a name="line-106"></a><a name="instance%20Applicative%20(R%20a)"></a><span class='hs-keyword'>instance</span> <span class='hs-conid'>Applicative</span> <span class='hs-layout'>(</span><span class='hs-conid'>R</span> <span class='hs-varid'>a</span><span class='hs-layout'>)</span> <span class='hs-keyword'>where</span>
-<a name="line-107"></a>  <span class='hs-varid'>pure</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>=</span> <span class='hs-conid'>R</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span><span class='hs-conid'>()</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>b</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span><span class='hs-keyword'>_</span> <span class='hs-conid'>()</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>()</span><span class='hs-layout'>)</span> <span class='hs-conid'>()</span>
-<a name="line-108"></a>  <span class='hs-comment'>{-# INLINE pure #-}</span>
-<a name="line-109"></a>
-<a name="line-110"></a>  <span class='hs-conid'>R</span> <span class='hs-varid'>xf</span> <span class='hs-varid'>bxx</span> <span class='hs-varid'>xz</span> <span class='hs-varop'>&lt;*&gt;</span> <span class='hs-conid'>R</span> <span class='hs-varid'>ya</span> <span class='hs-varid'>byy</span> <span class='hs-varid'>yz</span> <span class='hs-keyglyph'>=</span> <span class='hs-conid'>R</span>
-<a name="line-111"></a>    <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span><span class='hs-layout'>(</span><span class='hs-conid'>Pair'</span> <span class='hs-varid'>x</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>xf</span> <span class='hs-varid'>x</span> <span class='hs-varop'>$</span> <span class='hs-varid'>ya</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span>
-<a name="line-112"></a>    <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span><span class='hs-varid'>b</span> <span class='hs-layout'>(</span><span class='hs-conid'>Pair'</span> <span class='hs-varid'>x</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Pair'</span> <span class='hs-layout'>(</span><span class='hs-varid'>bxx</span> <span class='hs-varid'>b</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>byy</span> <span class='hs-varid'>b</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span>
-<a name="line-113"></a>    <span class='hs-layout'>(</span><span class='hs-conid'>Pair'</span> <span class='hs-varid'>xz</span> <span class='hs-varid'>yz</span><span class='hs-layout'>)</span>
-<a name="line-114"></a>  <span class='hs-comment'>{-# INLINE (&lt;*&gt;) #-}</span>
-<a name="line-115"></a>
-<a name="line-116"></a>  <span class='hs-layout'>(</span><span class='hs-varop'>&lt;*</span><span class='hs-layout'>)</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-keyglyph'>\</span><span class='hs-keyword'>_</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>m</span>
-<a name="line-117"></a>  <span class='hs-comment'>{-# INLINE (&lt;*) #-}</span>
+<a name="line-106"></a>  <span class='hs-keyword'>_</span> <span class='hs-varop'>&gt;&gt;</span> <span class='hs-varid'>n</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>n</span>
+<a name="line-107"></a>  <span class='hs-comment'>{-# INLINE (&gt;&gt;) #-}</span>
+<a name="line-108"></a>
+<a name="line-109"></a><a name="instance%20Applicative%20(R%20a)"></a><span class='hs-keyword'>instance</span> <span class='hs-conid'>Applicative</span> <span class='hs-layout'>(</span><span class='hs-conid'>R</span> <span class='hs-varid'>a</span><span class='hs-layout'>)</span> <span class='hs-keyword'>where</span>
+<a name="line-110"></a>  <span class='hs-varid'>pure</span> <span class='hs-varid'>b</span> <span class='hs-keyglyph'>=</span> <span class='hs-conid'>R</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span><span class='hs-conid'>()</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>b</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span><span class='hs-keyword'>_</span> <span class='hs-conid'>()</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>()</span><span class='hs-layout'>)</span> <span class='hs-conid'>()</span>
+<a name="line-111"></a>  <span class='hs-comment'>{-# INLINE pure #-}</span>
+<a name="line-112"></a>
+<a name="line-113"></a>  <span class='hs-conid'>R</span> <span class='hs-varid'>xf</span> <span class='hs-varid'>bxx</span> <span class='hs-varid'>xz</span> <span class='hs-varop'>&lt;*&gt;</span> <span class='hs-conid'>R</span> <span class='hs-varid'>ya</span> <span class='hs-varid'>byy</span> <span class='hs-varid'>yz</span> <span class='hs-keyglyph'>=</span> <span class='hs-conid'>R</span>
+<a name="line-114"></a>    <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span><span class='hs-layout'>(</span><span class='hs-conid'>Pair'</span> <span class='hs-varid'>x</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>xf</span> <span class='hs-varid'>x</span> <span class='hs-varop'>$</span> <span class='hs-varid'>ya</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span>
+<a name="line-115"></a>    <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span><span class='hs-varid'>b</span> <span class='hs-layout'>(</span><span class='hs-conid'>Pair'</span> <span class='hs-varid'>x</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Pair'</span> <span class='hs-layout'>(</span><span class='hs-varid'>bxx</span> <span class='hs-varid'>b</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>byy</span> <span class='hs-varid'>b</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span>
+<a name="line-116"></a>    <span class='hs-layout'>(</span><span class='hs-conid'>Pair'</span> <span class='hs-varid'>xz</span> <span class='hs-varid'>yz</span><span class='hs-layout'>)</span>
+<a name="line-117"></a>  <span class='hs-comment'>{-# INLINE (&lt;*&gt;) #-}</span>
 <a name="line-118"></a>
-<a name="line-119"></a>  <span class='hs-keyword'>_</span> <span class='hs-varop'>*&gt;</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>m</span>
-<a name="line-120"></a>  <span class='hs-comment'>{-# INLINE (*&gt;) #-}</span>
+<a name="line-119"></a>  <span class='hs-layout'>(</span><span class='hs-varop'>&lt;*</span><span class='hs-layout'>)</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-keyglyph'>\</span><span class='hs-keyword'>_</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>m</span>
+<a name="line-120"></a>  <span class='hs-comment'>{-# INLINE (&lt;*) #-}</span>
 <a name="line-121"></a>
-<a name="line-122"></a><a name="instance%20Extend%20(R%20a)"></a><span class='hs-keyword'>instance</span> <span class='hs-conid'>Extend</span> <span class='hs-layout'>(</span><span class='hs-conid'>R</span> <span class='hs-varid'>a</span><span class='hs-layout'>)</span> <span class='hs-keyword'>where</span>
-<a name="line-123"></a>  <span class='hs-varid'>extended</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>extend</span>
-<a name="line-124"></a>  <span class='hs-comment'>{-# INLINE extended #-}</span>
-<a name="line-125"></a>
-<a name="line-126"></a>  <span class='hs-varid'>duplicated</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>duplicate</span>
-<a name="line-127"></a>  <span class='hs-comment'>{-# INLINE duplicated #-}</span>
+<a name="line-122"></a>  <span class='hs-keyword'>_</span> <span class='hs-varop'>*&gt;</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>m</span>
+<a name="line-123"></a>  <span class='hs-comment'>{-# INLINE (*&gt;) #-}</span>
+<a name="line-124"></a>
+<a name="line-125"></a><a name="instance%20Extend%20(R%20a)"></a><span class='hs-keyword'>instance</span> <span class='hs-conid'>Extend</span> <span class='hs-layout'>(</span><span class='hs-conid'>R</span> <span class='hs-varid'>a</span><span class='hs-layout'>)</span> <span class='hs-keyword'>where</span>
+<a name="line-126"></a>  <span class='hs-varid'>extended</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>extend</span>
+<a name="line-127"></a>  <span class='hs-comment'>{-# INLINE extended #-}</span>
 <a name="line-128"></a>
-<a name="line-129"></a><a name="instance%20Apply%20(R%20a)"></a><span class='hs-keyword'>instance</span> <span class='hs-conid'>Apply</span> <span class='hs-layout'>(</span><span class='hs-conid'>R</span> <span class='hs-varid'>a</span><span class='hs-layout'>)</span> <span class='hs-keyword'>where</span>
-<a name="line-130"></a>  <span class='hs-layout'>(</span><span class='hs-varop'>&lt;.&gt;</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>=</span> <span class='hs-layout'>(</span><span class='hs-varop'>&lt;*&gt;</span><span class='hs-layout'>)</span>
-<a name="line-131"></a>  <span class='hs-comment'>{-# INLINE (&lt;.&gt;) #-}</span>
-<a name="line-132"></a>
-<a name="line-133"></a>  <span class='hs-layout'>(</span><span class='hs-varop'>&lt;.</span><span class='hs-layout'>)</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-keyglyph'>\</span><span class='hs-keyword'>_</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>m</span>
-<a name="line-134"></a>  <span class='hs-comment'>{-# INLINE (&lt;.) #-}</span>
+<a name="line-129"></a>  <span class='hs-varid'>duplicated</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>duplicate</span>
+<a name="line-130"></a>  <span class='hs-comment'>{-# INLINE duplicated #-}</span>
+<a name="line-131"></a>
+<a name="line-132"></a><a name="instance%20Apply%20(R%20a)"></a><span class='hs-keyword'>instance</span> <span class='hs-conid'>Apply</span> <span class='hs-layout'>(</span><span class='hs-conid'>R</span> <span class='hs-varid'>a</span><span class='hs-layout'>)</span> <span class='hs-keyword'>where</span>
+<a name="line-133"></a>  <span class='hs-layout'>(</span><span class='hs-varop'>&lt;.&gt;</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>=</span> <span class='hs-layout'>(</span><span class='hs-varop'>&lt;*&gt;</span><span class='hs-layout'>)</span>
+<a name="line-134"></a>  <span class='hs-comment'>{-# INLINE (&lt;.&gt;) #-}</span>
 <a name="line-135"></a>
-<a name="line-136"></a>  <span class='hs-keyword'>_</span> <span class='hs-varop'>.&gt;</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>m</span>
-<a name="line-137"></a>  <span class='hs-comment'>{-# INLINE (.&gt;) #-}</span>
+<a name="line-136"></a>  <span class='hs-layout'>(</span><span class='hs-varop'>&lt;.</span><span class='hs-layout'>)</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-keyglyph'>\</span><span class='hs-keyword'>_</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>m</span>
+<a name="line-137"></a>  <span class='hs-comment'>{-# INLINE (&lt;.) #-}</span>
 <a name="line-138"></a>
-<a name="line-139"></a><a name="instance%20ComonadApply%20(R%20a)"></a><span class='hs-keyword'>instance</span> <span class='hs-conid'>ComonadApply</span> <span class='hs-layout'>(</span><span class='hs-conid'>R</span> <span class='hs-varid'>a</span><span class='hs-layout'>)</span> <span class='hs-keyword'>where</span>
-<a name="line-140"></a>  <span class='hs-layout'>(</span><span class='hs-varop'>&lt;@&gt;</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>=</span> <span class='hs-layout'>(</span><span class='hs-varop'>&lt;*&gt;</span><span class='hs-layout'>)</span>
-<a name="line-141"></a>  <span class='hs-comment'>{-# INLINE (&lt;@&gt;) #-}</span>
-<a name="line-142"></a>
-<a name="line-143"></a>  <span class='hs-layout'>(</span><span class='hs-varop'>&lt;@</span><span class='hs-layout'>)</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-keyglyph'>\</span><span class='hs-keyword'>_</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>m</span>
-<a name="line-144"></a>  <span class='hs-comment'>{-# INLINE (&lt;@) #-}</span>
+<a name="line-139"></a>  <span class='hs-keyword'>_</span> <span class='hs-varop'>.&gt;</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>m</span>
+<a name="line-140"></a>  <span class='hs-comment'>{-# INLINE (.&gt;) #-}</span>
+<a name="line-141"></a>
+<a name="line-142"></a><a name="instance%20ComonadApply%20(R%20a)"></a><span class='hs-keyword'>instance</span> <span class='hs-conid'>ComonadApply</span> <span class='hs-layout'>(</span><span class='hs-conid'>R</span> <span class='hs-varid'>a</span><span class='hs-layout'>)</span> <span class='hs-keyword'>where</span>
+<a name="line-143"></a>  <span class='hs-layout'>(</span><span class='hs-varop'>&lt;@&gt;</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>=</span> <span class='hs-layout'>(</span><span class='hs-varop'>&lt;*&gt;</span><span class='hs-layout'>)</span>
+<a name="line-144"></a>  <span class='hs-comment'>{-# INLINE (&lt;@&gt;) #-}</span>
 <a name="line-145"></a>
-<a name="line-146"></a>  <span class='hs-keyword'>_</span> <span class='hs-varop'>@&gt;</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>m</span>
-<a name="line-147"></a>  <span class='hs-comment'>{-# INLINE (@&gt;) #-}</span>
+<a name="line-146"></a>  <span class='hs-layout'>(</span><span class='hs-varop'>&lt;@</span><span class='hs-layout'>)</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-keyglyph'>\</span><span class='hs-keyword'>_</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>m</span>
+<a name="line-147"></a>  <span class='hs-comment'>{-# INLINE (&lt;@) #-}</span>
+<a name="line-148"></a>
+<a name="line-149"></a>  <span class='hs-keyword'>_</span> <span class='hs-varop'>@&gt;</span> <span class='hs-varid'>m</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>m</span>
+<a name="line-150"></a>  <span class='hs-comment'>{-# INLINE (@&gt;) #-}</span>
 </pre></body>
 </html>
