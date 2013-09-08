@@ -50,6 +50,14 @@ instance Applicative (L1 a) where
   _ *> m = m
   {-# INLINE (*>) #-}
 
+instance Monad (L1 a) where
+  return x = L1 (\() -> x) (\() _ -> ()) (\_ -> ())
+  {-# INLINE return #-}
+  m >>= f = L1 (\xs a -> walk xs (f a)) Snoc1 First <*> m where
+  {-# INLINE (>>=) #-}
+  _ >> n = n
+  {-# INLINE (>>) #-}
+
 instance Semigroupoid L1 where
   o = (.)
   {-# INLINE o #-}
@@ -121,3 +129,11 @@ instance ArrowChoice L1 where
     step (Left c) _ = Left c
     step _ (Left c) = Left c
   {-# INLINE right #-}
+
+data SnocList1 a = Snoc1 (SnocList1 a) a | First a
+
+walk :: SnocList1 a -> L1 a b -> b
+walk xs0 (L1 k h z) = k (go xs0) where
+  go (First a) = z a
+  go (Snoc1 as a) = h (go as) a
+{-# INLINE walk #-}
