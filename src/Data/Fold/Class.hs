@@ -3,6 +3,7 @@
 module Data.Fold.Class
   ( Folding(..)
   , Filtering(..)
+  , Interspersing(..)
   , beneath
   ) where
 
@@ -76,3 +77,6 @@ beneath l f = runMutator #. l (Mutator #. f)
 
 class Folding p => Filtering p where
   filtering :: (a -> Bool) -> p a b -> p a b
+
+class Folding p => Interspersing p where
+  interspersing :: a -> p a b -> p a b

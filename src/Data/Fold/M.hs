@@ -16,10 +16,10 @@ import Control.Applicative
 import Control.Comonad
 import Control.Lens
 import Data.Fold.Class
+import Data.Fold.Internal
 import Data.Foldable hiding (sum, product)
 import Data.Functor.Extend
 import Data.Functor.Bind
-import Data.Monoid
 import Data.Profunctor.Unsafe
 import Data.Proxy
 import Data.Reflection
@@ -55,6 +55,13 @@ instance Folding M where
 
 instance Filtering M where
   filtering p (M k h m z) = M k (\a -> if p a then h a else z) m z
+
+instance Interspersing M where
+  interspersing a (M k h m z) = M (maybe' (k z) k) h' m' Nothing' where
+    h' r  = Just' (h r)
+    m' (Just' x) (Just' y) = Just' (x `m` h a `m` y)
+    m' Nothing' my = my
+    m' mx Nothing' = mx
 
 instance Profunctor M where
   dimap f g (M k h m e) = M (g.k) (h.f) m e
@@ -95,17 +102,15 @@ instance Comonad (M a) where
   duplicate (M k h m z) = M (\n -> M (k . m n) h m z) h m z
   {-# INLINE duplicate #-}
 
-data Pair a b = Pair !a !b
-
 instance Applicative (M a) where
   pure b = M (\() -> b) (\_ -> ()) (\() () -> ()) ()
   {-# INLINE pure #-}
 
   M xf bx xx xz <*> M ya by yy yz = M
-    (\(Pair x y) -> xf x $ ya y)
-    (\b -> Pair (bx b) (by b))
-    (\(Pair x1 y1) (Pair x2 y2) -> Pair (xx x1 x2) (yy y1 y2))
-    (Pair xz yz)
+    (\(Pair' x y) -> xf x $ ya y)
+    (\b -> Pair' (bx b) (by b))
+    (\(Pair' x1 y1) (Pair' x2 y2) -> Pair' (xx x1 x2) (yy y1 y2))
+    (Pair' xz yz)
   {-# INLINE (<*>) #-}
 
   (<*) m = \_ -> m
@@ -150,33 +155,3 @@ instance ComonadApply (M a) where
 
   _ @> m = m
   {-# INLINE (@>) #-}
-
--- * Internals
-
--- | A reified 'Monoid'.
-newtype N a s = N { runN :: a }
-
-instance Reifies s (a -> a -> a, a) => Monoid (N a s) where
-  mempty = N $ snd $ reflect (Proxy :: Proxy s)
-  {-# INLINE mempty #-}
-  mappend (N a) (N b) = N $ fst (reflect (Proxy :: Proxy s)) a b
-  {-# INLINE mappend #-}
-
--- | The shape of a 'foldMap'
-data Tree a = Zero | One a | Two (Tree a) (Tree a)
-
-instance Functor Tree where
-  fmap _ Zero = Zero
-  fmap f (One a) = One (f a)
-  fmap f (Two a b) = Two (fmap f a) (fmap f b)
-
-instance Foldable Tree where
-  foldMap _ Zero = mempty
-  foldMap f (One a) = f a
-  foldMap f (Two a b) = foldMap f a `mappend` foldMap f b
-
-instance Traversable Tree where
-  traverse _ Zero = pure Zero
-  traverse f (One a) = One <$> f a
-  traverse f (Two a b) = Two <$> traverse f a <*> traverse f b
-

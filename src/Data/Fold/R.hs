@@ -13,10 +13,10 @@ import Control.Comonad
 import Control.Lens
 import Data.Foldable hiding (sum, product)
 import Data.Fold.Class
+import Data.Fold.Internal
 import Data.Functor.Extend
 import Data.Functor.Bind
 import Data.Profunctor.Unsafe
--- import Data.Traversable
 import Unsafe.Coerce
 import Prelude hiding (foldr, sum, product, length)
 
@@ -80,8 +80,6 @@ instance Comonad (R a) where
   extend f (R k h z)  = R (f . R k h) h z
   {-# INLINE extend #-}
 
-data Pair a b = Pair !a !b
-
 instance Bind (R a) where
   (>>-) = (>>=)
   {-# INLINE (>>-) #-}
@@ -98,9 +96,9 @@ instance Applicative (R a) where
   {-# INLINE pure #-}
 
   R xf bxx xz <*> R ya byy yz = R
-    (\(Pair x y) -> xf x $ ya y)
-    (\b (Pair x y) -> Pair (bxx b x) (byy b y))
-    (Pair xz yz)
+    (\(Pair' x y) -> xf x $ ya y)
+    (\b (Pair' x y) -> Pair' (bxx b x) (byy b y))
+    (Pair' xz yz)
   {-# INLINE (<*>) #-}
 
   (<*) m = \_ -> m

@@ -13,9 +13,9 @@ import Control.Comonad
 import Control.Lens
 import Data.Foldable
 import Data.Fold.Class
+import Data.Fold.Internal
 import Data.Functor.Extend
 import Data.Functor.Bind
-import Data.Monoid
 import Data.Profunctor.Unsafe
 import Unsafe.Coerce
 import Prelude hiding (foldl)
@@ -37,6 +37,11 @@ instance Folding L' where
 
 instance Filtering L' where
   filtering p (L' k h z) = L' k (\r a -> if p a then h r a else r) z
+
+instance Interspersing L' where
+  interspersing a (L' k h z) = L' (maybe' (k z) k) h' Nothing' where
+    h' Nothing' b  = Just' (h z b)
+    h' (Just' x) b = Just' (h (h x a) b)
 
 instance Profunctor L' where
   dimap f g (L' k h z) = L' (g.k) (\r -> h r . f) z
@@ -134,14 +139,3 @@ instance ComonadApply (L' a) where
 
   _ @> m = m
   {-# INLINE (@>) #-}
-
-data SnocList a = Snoc (SnocList a) a | Nil
-
-instance Foldable SnocList where
-  foldl f z m0 = go m0 where
-    go (Snoc xs x) = f (go xs) x
-    go Nil = z
-  {-# INLINE foldl #-}
-  foldMap f (Snoc xs x) = foldMap f xs `mappend` f x
-  foldMap _ Nil = mempty
-  {-# INLINE foldMap #-}
