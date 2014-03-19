@@ -15,6 +15,7 @@ module Data.Fold.M
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
+import Control.Monad.Zip
 import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Foldable hiding (sum, product)
@@ -141,6 +142,10 @@ instance Monad (M a) where
 
   _ >> n = n
   {-# INLINE (>>) #-}
+
+instance MonadZip (M a) where
+  mzipWith = liftA2
+  {-# INLINE mzipWith #-}
 
 instance Extend (M a) where
   extended = extend

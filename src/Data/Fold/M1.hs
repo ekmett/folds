@@ -8,6 +8,7 @@ import Control.Applicative
 import Control.Arrow
 import Control.Category
 import Control.Lens
+import Control.Monad.Zip
 import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Functor.Apply
@@ -71,6 +72,10 @@ instance Monad (M1 a) where
   {-# INLINE (>>=) #-}
   _ >> n = n
   {-# INLINE (>>) #-}
+
+instance MonadZip (M1 a) where
+  mzipWith = liftA2
+  {-# INLINE mzipWith #-}
 
 instance Semigroupoid M1 where
   o = (.)

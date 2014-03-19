@@ -12,6 +12,7 @@ module Data.Fold.L'
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
+import Control.Monad.Zip
 import Data.Foldable
 import Data.Fold.Class
 import Data.Fold.Internal
@@ -132,6 +133,10 @@ instance Monad (L' a) where
 
   _ >> n = n
   {-# INLINE (>>) #-}
+
+instance MonadZip (L' a) where
+  mzipWith = liftA2
+  {-# INLINE mzipWith #-}
 
 instance Extend (L' a) where
   extended = extend

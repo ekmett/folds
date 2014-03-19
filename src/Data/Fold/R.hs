@@ -10,8 +10,8 @@ module Data.Fold.R
 
 import Control.Applicative
 import Control.Comonad
-import Control.Monad.Zip
 import Control.Lens
+import Control.Monad.Zip
 import Data.Foldable hiding (sum, product)
 import Data.Fold.Class
 import Data.Fold.Internal
