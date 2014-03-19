@@ -114,7 +114,7 @@ instance Applicative (R a) where
 
   R xf bxx xz <*> R ya byy yz = R
     (\(Pair' x y) -> xf x $ ya y)
-    (\b (Pair' x y) -> Pair' (bxx b x) (byy b y))
+    (\b ~(Pair' x y) -> Pair' (bxx b x) (byy b y))
     (Pair' xz yz)
   {-# INLINE (<*>) #-}
 

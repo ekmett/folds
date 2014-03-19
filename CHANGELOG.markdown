@@ -1,3 +1,7 @@
+0.5.1
+-----
+* Lazier `R`.
+
 0.5.0.1
 -------
 * Restore compatibility with GHC < 7.8
