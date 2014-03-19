@@ -10,6 +10,7 @@ module Data.Fold.R
 
 import Control.Applicative
 import Control.Comonad
+import Control.Monad.Zip
 import Control.Lens
 import Data.Foldable hiding (sum, product)
 import Data.Fold.Class
@@ -107,6 +108,10 @@ instance Monad (R a) where
 
   _ >> n = n
   {-# INLINE (>>) #-}
+
+instance MonadZip (R a) where
+  mzipWith = liftA2
+  {-# INLINE mzipWith #-}
 
 instance Applicative (R a) where
   pure b = R (\() -> b) (\_ () -> ()) ()
