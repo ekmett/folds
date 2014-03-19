@@ -54,7 +54,7 @@ instance Applicative (R1 a) where
   {-# INLINE pure #-}
   R1 kf hf zf <*> R1 ka ha za = R1
     (\(Pair' x y) -> kf x (ka y))
-    (\a (Pair' x y) -> Pair' (hf a x) (ha a y))
+    (\a ~(Pair' x y) -> Pair' (hf a x) (ha a y))
     (\a -> Pair' (zf a) (za a))
   (<*) m = \ _ -> m
   {-# INLINE (<*) #-}
