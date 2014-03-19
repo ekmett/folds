@@ -19,7 +19,6 @@ import Control.Applicative
 import Data.Data
 import Data.Foldable
 import Data.Monoid hiding (First, Last)
-import Data.Proxy
 import Data.Reflection
 import Data.Traversable
 

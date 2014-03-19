@@ -8,7 +8,6 @@ module Data.Fold.Class
   ) where
 
 import Control.Lens
-import Control.Lens.Internal.Setter
 import Data.Foldable
 import Data.Fold.Internal
 import Data.Profunctor.Unsafe
@@ -84,5 +83,5 @@ class Scan p => Folding p where
 -- beneath :: Prism s t a b -> p a b -> p s t
 -- beneath :: Iso s t a b   -> p a b -> p s t
 -- @
-beneath :: Profunctor p => Overloaded p Mutator s t a b -> p a b -> p s t
-beneath l f = runMutator #. l (Mutator #. f)
+beneath :: Profunctor p => Optic p Identity s t a b -> p a b -> p s t
+beneath l f = runIdentity #. l (Identity #. f)
