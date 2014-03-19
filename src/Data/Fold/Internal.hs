@@ -16,9 +16,10 @@ module Data.Fold.Internal
   ) where
 
 import Control.Applicative
-import Data.Data
+import Data.Data (Data, Typeable)
 import Data.Foldable
 import Data.Monoid hiding (First, Last)
+import Data.Proxy (Proxy(Proxy))
 import Data.Reflection
 import Data.Traversable
 
