@@ -1,3 +1,8 @@
+0.6
+---
+* Lazier `R1`.
+* `MonadZip` instances
+
 0.5.1
 -----
 * Lazier `R`.
