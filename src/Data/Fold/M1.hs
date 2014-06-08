@@ -93,10 +93,10 @@ instance Arrow M1 where
   arr h = M1 h id const
   {-# INLINE arr #-}
   first (M1 k h m) = M1 (first k) (first h) m' where
-    m' (a,b) (c,_) = (m a c, b)
+    m' (a,_) (c,b) = (m a c, b)
   {-# INLINE first #-}
   second (M1 k h m) = M1 (second k) (second h) m' where
-    m' (a,b) (_,c) = (a, m b c)
+    m' (_,b) (a,c) = (a, m b c)
   {-# INLINE second #-}
   M1 k h m *** M1 k' h' m' = M1 (k *** k') (h *** h') m'' where
     m'' (a,b) (c,d) = (m a c, m' b d)
