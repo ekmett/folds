@@ -90,10 +90,10 @@ instance Arrow R1 where
   arr h = R1 h const id
   {-# INLINE arr #-}
   first (R1 k h z) = R1 (first k) h' (first z) where
-    h' (a,b) (c,_) = (h a c, b)
+    h' (a,_) (c,b) = (h a c, b)
   {-# INLINE first #-}
   second (R1 k h z) = R1 (second k) h' (second z) where
-    h' (a,b) (_,c) = (a, h b c)
+    h' (_,b) (a,c) = (a, h b c)
   {-# INLINE second #-}
   R1 k h z *** R1 k' h' z' = R1 (k *** k') h'' (z *** z') where
     h'' (a,b) (c,d) = (h a c, h' b d)

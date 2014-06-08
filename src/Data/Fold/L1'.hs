@@ -85,10 +85,10 @@ instance Arrow L1' where
   arr h = L1' h (\_ a -> a) id
   {-# INLINE arr #-}
   first (L1' k h z) = L1' (first k) h' (first z) where
-    h' (a,b) (c,_) = (h a c, b)
+    h' (a,_) (c,b) = (h a c, b)
   {-# INLINE first #-}
   second (L1' k h z) = L1' (second k) h' (second z) where
-    h' (a,b) (_,c) = (a, h b c)
+    h' (_,b) (a,c) = (a, h b c)
   {-# INLINE second #-}
   L1' k h z *** L1' k' h' z' = L1' (k *** k') h'' (z *** z') where
     h'' (a,b) (c,d) = (h a c, h' b d)
