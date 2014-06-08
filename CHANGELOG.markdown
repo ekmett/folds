@@ -1,3 +1,7 @@
+0.6.1
+-----
+* Fixed bugs in several of the `Arrow` instances.
+
 0.6
 ---
 * Lazier `R1`.
