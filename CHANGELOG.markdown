@@ -1,3 +1,7 @@
+0.6.2
+-----
+* `contravariant` 1.0 support
+
 0.6.1
 -----
 * Fixed bugs in several of the `Arrow` instances.
