@@ -65,7 +65,7 @@ instance Applicative (R1 a) where
 instance Monad (R1 a) where
   return x = R1 (\() -> x) (\_ () -> ()) (\_ -> ())
   {-# INLINE return #-}
-  m >>= f = R1 (\xs a -> walk xs (f a)) Cons1 Last <*> m where
+  m >>= f = R1 (\xs a -> walk xs (f a)) Cons1 Last <*> m
   {-# INLINE (>>=) #-}
   _ >> n = n
   {-# INLINE (>>) #-}
@@ -105,7 +105,7 @@ instance Arrow R1 where
 instance Profunctor R1 where
   dimap f g (R1 k h z) = R1 (g.k) (h.f) (z.f)
   {-# INLINE dimap #-}
-  lmap f (R1 k h z) = R1 (k) (h.f) (z.f)
+  lmap f (R1 k h z) = R1 k (h.f) (z.f)
   {-# INLINE lmap #-}
   rmap g (R1 k h z) = R1 (g.k) h z
   {-# INLINE rmap #-}

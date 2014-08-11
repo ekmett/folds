@@ -1,5 +1,6 @@
-{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE Trustworthy #-}
+{-# LANGUAGE ExistentialQuantification #-}
 module Data.Fold.L1'
   ( L1'(..)
   ) where
@@ -64,7 +65,7 @@ instance Applicative (L1' a) where
 instance Monad (L1' a) where
   return x = L1' (\() -> x) (\() _ -> ()) (\_ -> ())
   {-# INLINE return #-}
-  m >>= f = L1' (\xs a -> walk xs (f a)) Snoc1 First <*> m where
+  m >>= f = L1' (\xs a -> walk xs (f a)) Snoc1 First <*> m
   {-# INLINE (>>=) #-}
   _ >> n = n
   {-# INLINE (>>) #-}
@@ -100,7 +101,7 @@ instance Arrow L1' where
 instance Profunctor L1' where
   dimap f g (L1' k h z) = L1' (g.k) (\a -> h a . f) (z.f)
   {-# INLINE dimap #-}
-  lmap f (L1' k h z) = L1' (k) (\a -> h a . f) (z.f)
+  lmap f (L1' k h z) = L1' k (\a -> h a . f) (z.f)
   {-# INLINE lmap #-}
   rmap g (L1' k h z) = L1' (g.k) h z
   {-# INLINE rmap #-}

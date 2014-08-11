@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE Trustworthy #-}
@@ -18,18 +19,24 @@ import Data.Profunctor.Unsafe
 
 class Choice p => Scan p where
   prefix1 :: a -> p a b -> p a b
+#ifndef HLINT
   default prefix1 :: Folding p => a -> p a b -> p a b
+#endif
   prefix1 = prefix . An
   {-# INLINE prefix1 #-}
 
   postfix1 :: p a b -> a -> p a b
+#ifndef HLINT
   default postfix1 :: Folding p => p a b -> a -> p a b
+#endif
   postfix1 p = postfix p . An
   {-# INLINE postfix1 #-}
 
   -- | Apply a 'Folding' to a single element of input
   run1 :: a -> p a b -> b
+#ifndef HLINT
   default run1 :: Folding p => a -> p a b -> b
+#endif
   run1 = run . An
   {-# INLINE run1 #-}
 
