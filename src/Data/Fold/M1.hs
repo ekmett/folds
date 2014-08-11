@@ -68,7 +68,7 @@ instance Applicative (M1 a) where
 instance Monad (M1 a) where
   return x = M1 (\() -> x) (\_ -> ()) (\() () -> ())
   {-# INLINE return #-}
-  m >>= f = M1 (\xs a -> walk xs (f a)) Tip1 Bin1 <*> m where
+  m >>= f = M1 (\xs a -> walk xs (f a)) Tip1 Bin1 <*> m
   {-# INLINE (>>=) #-}
   _ >> n = n
   {-# INLINE (>>) #-}
@@ -108,7 +108,7 @@ instance Arrow M1 where
 instance Profunctor M1 where
   dimap f g (M1 k h m) = M1 (g.k) (h.f) m
   {-# INLINE dimap #-}
-  lmap f (M1 k h m) = M1 (k) (h.f) m
+  lmap f (M1 k h m) = M1 k (h.f) m
   {-# INLINE lmap #-}
   rmap g (M1 k h m) = M1 (g.k) h m
   {-# INLINE rmap #-}
