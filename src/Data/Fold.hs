@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DefaultSignatures #-}
 -----------------------------------------------------------------------------
 -- |
@@ -210,7 +211,9 @@ instance AsRM L' where
 class AsRM1 p => AsL1' p where
   -- | Scan homomorphism to a strict Mealy machine
   asL1' :: p a b -> L1' a b
+#ifndef HLINT
   default asL1' :: AsL' p => p a b -> L1' a b
+#endif
   asL1' = asL1'.asL'
 
 instance AsL1' L1' where
