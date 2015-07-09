@@ -113,6 +113,3 @@ test-suite doctests
       filepath,
       mtl,
       semigroups     >= 0.9
-
-  if impl(ghc<7.6.1)
-    ghc-options: -Werror
