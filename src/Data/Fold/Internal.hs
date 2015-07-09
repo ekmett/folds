@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -15,13 +16,19 @@ module Data.Fold.Internal
   , Box(..)
   ) where
 
+#if __GLASGOW_HASKELL__ < 710
 import Control.Applicative
+#endif
 import Data.Data (Data, Typeable)
+#if __GLASGOW_HASKELL__ < 710
 import Data.Foldable
 import Data.Monoid hiding (First, Last)
+#endif
 import Data.Proxy (Proxy(Proxy))
 import Data.Reflection
+#if __GLASGOW_HASKELL__ < 710
 import Data.Traversable
+#endif
 
 -- | Reversed '[]'
 data SnocList a = Snoc (SnocList a) a | Nil

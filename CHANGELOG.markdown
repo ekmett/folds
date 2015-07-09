@@ -1,3 +1,8 @@
+0.6.3
+-------
+* `reflection` 2 support
+* Compiles warning-free on GHC 7.10
+
 0.6.2
 -----
 * `contravariant` 1.0 support
