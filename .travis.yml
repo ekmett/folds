@@ -7,15 +7,15 @@ matrix:
       addons: {apt: {packages: [cabal-install-1.16, ghc-7.4.2], sources: [hvr-ghc]}}
     - env: CABALVER=1.18 GHCVER=7.6.3 GHCOPTS="-Werror" JOPTS="-j2" HAPPYOPTS=""
       addons: {apt: {packages: [cabal-install-1.18, ghc-7.6.3], sources: [hvr-ghc]}}
-    - env: CABALVER=1.18 GHCVER=7.8.4 GHCOPTS="-Werror" JOPTS="-j2" HAPPYOPTS="--constraint=transformers\ ==\ 0.3.0.0"
+    - env: CABALVER=1.18 GHCVER=7.8.4 GHCOPTS="-Werror" JOPTS="-j2" HAPPYOPTS="--constraint='transformers\ ==\ 0.3.0.0'"
       addons: {apt: {packages: [cabal-install-1.18, ghc-7.8.4], sources: [hvr-ghc]}}
-    - env: CABALVER=1.22 GHCVER=7.10.1 GHCOPTS="" JOPTS="-j2" HAPPYOPTS="--constraint=transformers\ installed"
+    - env: CABALVER=1.22 GHCVER=7.10.1 GHCOPTS="" JOPTS="-j2" HAPPYOPTS="--constraint='transformers\ installed'"
       addons: {apt: {packages: [cabal-install-1.22, ghc-7.10.1],sources: [hvr-ghc]}}
-    - env: CABALVER=head GHCVER=head GHCOPTS="" JOPTS="-j2" HAPPYOPTS="--constraint=transformers\ installed"
+    - env: CABALVER=head GHCVER=head GHCOPTS="" JOPTS="-j2" HAPPYOPTS="--constraint='transformers\ installed'"
       addons: {apt: {packages: [cabal-install-head,ghc-head],  sources: [hvr-ghc]}}
 
   allow_failures:
-   - env: CABALVER=head GHCVER=head GHCOPTS="" JOPTS="-j2" HAPPYOPTS="--constraint=transformers\ installed"
+   - env: CABALVER=head GHCVER=head GHCOPTS="" JOPTS="-j2" HAPPYOPTS="--constraint='transformers\ installed'"
 
 before_install:
  - export PATH=$HOME/.cabal/bin:/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
