@@ -1,7 +1,7 @@
 folds
 ======
 
-[![Build Status](https://secure.travis-ci.org/ekmett/folds.png?branch=master)](http://travis-ci.org/ekmett/folds)
+[![Hackage](https://img.shields.io/hackage/v/folds.svg)](https://hackage.haskell.org/package/folds) [![Build Status](https://secure.travis-ci.org/ekmett/folds.png?branch=master)](http://travis-ci.org/ekmett/folds
 
 A playground for working with different kinds of comonadic folds.
 
