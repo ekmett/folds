@@ -1,3 +1,7 @@
+0.6.4
+-----
+* `L` and `L'` are representable functors.
+
 0.6.3
 -------
 * `reflection` 2 support

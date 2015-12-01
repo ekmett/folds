@@ -1,6 +1,6 @@
 name:          folds
 category:      Data, Comonads, Enumerator
-version:       0.6.3
+version:       0.6.4
 license:       BSD3
 cabal-version: >= 1.8
 license-file:  LICENSE
