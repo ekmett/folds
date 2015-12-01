@@ -2,6 +2,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE ExistentialQuantification #-}
 module Data.Fold.L'
@@ -13,11 +14,13 @@ import Control.Applicative
 import Control.Comonad
 import Control.Lens
 import Control.Monad.Zip
+import Data.Distributive
 import Data.Foldable
 import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Functor.Extend
 import Data.Functor.Bind
+import Data.Functor.Rep
 import Data.Profunctor.Unsafe
 import Unsafe.Coerce
 import Prelude hiding (foldl)
@@ -164,3 +167,15 @@ instance ComonadApply (L' a) where
 
   _ @> m = m
   {-# INLINE (@>) #-}
+
+instance Distributive (L' a) where
+  distribute = L' (fmap extract) (\fm a -> fmap (prefix1 a) fm)
+  {-# INLINE distribute #-}
+
+instance Representable (L' a) where
+  type Rep (L' a) = [a]
+  index (L' k0 h0 z0) as0 = go k0 h0 z0 as0 where
+    go k _ z [] = k z
+    go k h z (a:as) = go k h (h z a) as
+  tabulate f = L' (f . reverse) (flip (:)) []
+  {-# INLINE tabulate #-}
