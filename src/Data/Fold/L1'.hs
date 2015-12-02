@@ -9,6 +9,7 @@ module Data.Fold.L1'
 import Control.Applicative
 import Control.Arrow
 import Control.Category
+import Control.Monad.Fix
 import Control.Monad.Reader.Class
 import Control.Lens
 import Data.Distributive
@@ -182,3 +183,6 @@ instance Closed L1' where
 instance MonadReader (NonEmpty a) (L1' a) where
   ask = askRep
   local = localRep
+
+instance MonadFix (L1' a) where
+  mfix = mfixRep

@@ -12,6 +12,7 @@ import Control.Applicative
 import Control.Arrow
 import Control.Category
 import Control.Lens
+import Control.Monad.Fix
 import Control.Monad.Reader.Class
 import Control.Monad.Zip
 import Data.Distributive
@@ -197,3 +198,6 @@ instance Costrong M1 where
 instance MonadReader (FreeSemigroup a) (M1 a) where
   ask = askRep
   local = localRep
+
+instance MonadFix (M1 a) where
+  mfix = mfixRep

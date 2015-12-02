@@ -18,6 +18,7 @@ module Data.Fold.M
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
+import Control.Monad.Fix
 import Control.Monad.Reader.Class
 import Control.Monad.Zip
 import Data.Distributive
@@ -211,3 +212,6 @@ instance Functor.Representable (M a) where
 instance Costrong M where
   unfirst = unfirstCorep
   unsecond = unsecondCorep
+
+instance MonadFix (M a) where
+  mfix = mfixRep

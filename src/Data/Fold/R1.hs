@@ -10,6 +10,7 @@ import Control.Applicative
 import Control.Arrow
 import Control.Category
 import Control.Lens
+import Control.Monad.Fix
 import Control.Monad.Reader.Class
 import Control.Monad.Zip
 import Data.Distributive
@@ -192,3 +193,6 @@ instance Functor.Representable (R1 a) where
 instance MonadReader (NonEmpty a) (R1 a) where
   ask = askRep
   local = localRep
+
+instance MonadFix (R1 a) where
+  mfix = mfixRep

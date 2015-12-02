@@ -15,6 +15,7 @@ import Control.Applicative
 import Control.Comonad
 import Control.Lens
 import Control.Monad.Reader.Class
+import Control.Monad.Fix
 import Control.Monad.Zip
 import Data.Distributive
 import Data.Foldable
@@ -209,3 +210,6 @@ instance Profunctor.Corepresentable L where
   type Corep L = []
   cotabulate f = L (f . reverse) (flip (:)) []
   {-# INLINE cotabulate #-}
+
+instance MonadFix (L a) where
+  mfix = mfixRep

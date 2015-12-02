@@ -13,6 +13,7 @@ module Data.Fold.R
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
+import Control.Monad.Fix
 import Control.Monad.Reader.Class
 import Control.Monad.Zip
 import Data.Distributive
@@ -195,3 +196,6 @@ instance MonadReader [a] (R a) where
 
 instance Closed R where
   closed (R k h z) = R (\f x -> k (f x)) (liftA2 h) (pure z)
+
+instance MonadFix (R a) where
+  mfix = mfixRep

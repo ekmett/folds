@@ -15,6 +15,7 @@ import Control.Applicative
 import Control.Comonad
 import Control.Lens
 import Control.Monad.Reader.Class
+import Control.Monad.Fix
 import Control.Monad.Zip
 import Data.Distributive
 import Data.Foldable
@@ -204,3 +205,6 @@ instance Cosieve L' [] where
 instance MonadReader [a] (L' a) where
   ask = askRep
   local = localRep
+
+instance MonadFix (L' a) where
+  mfix = mfixRep
