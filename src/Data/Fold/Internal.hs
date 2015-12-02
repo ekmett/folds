@@ -17,12 +17,15 @@ module Data.Fold.Internal
   , Maybe'(..), maybe'
   , Pair'(..)
   , N(..)
+  , S(..)
   , Tree(..)
   , Tree1(..)
   , An(..)
   , Box(..)
+  , FreeMonoid(..)
   , foldDeRef
-  , Free(..)
+  , FreeSemigroup(..)
+  , foldDeRef1
   ) where
 
 #if __GLASGOW_HASKELL__ < 710
@@ -34,14 +37,20 @@ import Data.Bifoldable
 import Data.Bitraversable
 import Data.Constraint
 import Data.Data (Data, Typeable)
+import Data.Semigroup hiding (Last, First)
 #if __GLASGOW_HASKELL__ < 710
 import Data.Foldable
-import Data.Monoid hiding (First, Last)
 #endif
+import Data.Functor.Bind
 import Data.HashMap.Lazy as HM
+import Data.Profunctor.Unsafe
 import Data.Proxy (Proxy(Proxy))
 import Data.Reflection
 import Data.Reify
+import Data.Semigroup.Foldable
+import Data.Semigroup.Bifoldable
+import Data.Semigroup.Bitraversable
+
 #if __GLASGOW_HASKELL__ < 710
 import Data.Traversable
 #endif
@@ -141,6 +150,12 @@ instance Traversable Tree where
   traverse f (One a) = One <$> f a
   traverse f (Two a b) = Two <$> traverse f a <*> traverse f b
 
+-- | A reified 'Semigroup'.
+newtype S a s = S { runS :: a }
+  deriving (Eq,Ord,Show,Read,Typeable,Data)
+
+instance Reifies s (a -> a -> a) => Semigroup (S a s) where
+  S a <> S b = S $ reflect (Proxy :: Proxy s) a b
 
 -- | Strict Pair
 data Pair' a b = Pair' !a !b deriving (Eq,Ord,Show,Read,Typeable,Data)
@@ -214,11 +229,18 @@ instance Traversable Tree1 where
   traverse f (Bin1 as bs) = Bin1 <$> traverse f as <*> traverse f bs
   traverse f (Tip1 a) = Tip1 <$> f a
 
-newtype Free p a = Free { runFree :: forall m. p m => (a -> m) -> m }
-  deriving Functor
+newtype FreeMonoid a = FreeMonoid { runFreeMonoid :: forall m. Monoid m => (a -> m) -> m } deriving Functor
 
-instance p ~ Monoid => Foldable (Free p) where
-  foldMap f m = runFree m f
+instance Foldable FreeMonoid where
+  foldMap f m = runFreeMonoid m f
+
+newtype FreeSemigroup a = FreeSemigroup { runFreeSemigroup :: forall m. Semigroup m => (a -> m) -> m } deriving Functor
+
+instance Foldable FreeSemigroup where
+  foldMap f (FreeSemigroup m) = unwrapMonoid $ m (WrapMonoid #. f)
+
+instance Foldable1 FreeSemigroup where
+  foldMap1 f (FreeSemigroup m) = m f
 
 data T a b = T0 | T1 a | T2 b b deriving (Functor, Foldable, Traversable)
 
@@ -232,10 +254,10 @@ class MuRef1 (f :: * -> *) where
   type DeRef1 f :: * -> * -> *
   muRef1 :: proxy (f a) -> Dict (MuRef (f a), DeRef (f a) ~ DeRef1 f a)
 
-foldDeRef :: forall f a. (MuRef1 f, Bifoldable (DeRef1 f)) => f a -> Free Monoid a
+foldDeRef :: forall f a. (MuRef1 f, Bifoldable (DeRef1 f)) => f a -> FreeMonoid a
 foldDeRef m = case muRef1 (undefined :: Proxy (f a)) of
   Dict -> case unsafePerformIO (reifyGraph m) of
-    Graph xs i | hm <- HM.fromList xs -> Free $ \ f -> fix (\mm -> fmap (bifoldMap f (mm !)) hm) ! i
+    Graph xs i | hm <- HM.fromList xs -> FreeMonoid $ \ f -> fix (\mm -> fmap (bifoldMap f (mm !)) hm) ! i
 
 instance MuRef1 Tree where
   type DeRef1 Tree = T
@@ -255,3 +277,39 @@ instance Bitraversable T where
   bitraverse _ _ T0 = pure T0
   bitraverse f _ (T1 a) = T1 <$> f a
   bitraverse _ g (T2 b c) = T2 <$> g b <*> g c
+
+data T1 a b = A a | B b b deriving (Functor, Foldable, Traversable)
+
+instance MuRef (Tree1 a) where
+  type DeRef (Tree1 a) = T1 a
+  mapDeRef _ (Tip1 a) = pure (A a)
+  mapDeRef f (Bin1 b c) = B <$> f b <*> f c
+
+instance MuRef1 Tree1 where
+  type DeRef1 Tree1 = T1
+  muRef1 _ = Dict
+
+instance Bifunctor T1 where
+  bimap f _ (A a) = A (f a)
+  bimap _ g (B b c) = B (g b) (g c)
+
+instance Bifoldable T1 where
+  bifoldMap f _ (A a) = f a
+  bifoldMap _ g (B b c) = g b `mappend` g c
+
+instance Bitraversable T1 where
+  bitraverse f _ (A a) = A <$> f a
+  bitraverse _ g (B b c) = B <$> g b <*> g c
+
+foldDeRef1 :: forall f a. (MuRef1 f, Bifoldable1 (DeRef1 f)) => f a -> FreeSemigroup a
+foldDeRef1 m = case muRef1 (undefined :: Proxy (f a)) of
+  Dict -> case unsafePerformIO (reifyGraph m) of
+    Graph xs i | hm <- HM.fromList xs -> FreeSemigroup $ \ f -> fix (\mm -> fmap (bifoldMap1 f (mm !)) hm) ! i
+
+instance Bifoldable1 T1 where
+  bifoldMap1 f _ (A a) = f a
+  bifoldMap1 _ g (B b c) = g b <> g c
+
+instance Bitraversable1 T1 where
+  bitraverse1 f _ (A a) = A <$> f a
+  bitraverse1 _ g (B b c) = B <$> g b <.> g c

@@ -2,7 +2,6 @@
 {-# LANGUAGE Trustworthy #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -191,15 +190,15 @@ instance Distributive (M a) where
 instance Closed M where
   closed (M k h m z) = M (\f x -> k (f x)) (fmap h) (liftA2 m) (pure z)
 
-instance Cosieve M (Free Monoid) where
+instance Cosieve M FreeMonoid where
   cosieve = flip run
 
 instance Profunctor.Corepresentable M where
-  type Corep M = Free Monoid
+  type Corep M = FreeMonoid
   cotabulate f = M (f . foldDeRef) One Two Zero
 
 instance Functor.Representable (M a) where
-  type Rep (M a) = Free Monoid a
+  type Rep (M a) = FreeMonoid a
   tabulate = cotabulate
   index = cosieve
 

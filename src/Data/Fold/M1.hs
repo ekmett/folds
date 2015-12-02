@@ -1,7 +1,11 @@
 {-# LANGUAGE Trustworthy #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ExistentialQuantification #-}
 module Data.Fold.M1
   ( M1(..)
+  , runM1
   ) where
 
 import Control.Applicative
@@ -9,13 +13,20 @@ import Control.Arrow
 import Control.Category
 import Control.Lens
 import Control.Monad.Zip
+import Data.Distributive
 import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Functor.Apply
+import Data.Functor.Rep as Functor
 import Data.Pointed
 import Data.Profunctor
 import Data.Profunctor.Closed
+import Data.Profunctor.Sieve
+import Data.Profunctor.Rep as Profunctor
 import Data.Profunctor.Unsafe
+import Data.Proxy
+import Data.Reflection
+import Data.Semigroup.Foldable
 import Data.Semigroupoid
 import Prelude hiding (id,(.))
 import Unsafe.Coerce
@@ -156,5 +167,28 @@ walk xs0 (M1 k h m) = k (go xs0) where
   go (Bin1 xs ys) = m (go xs) (go ys)
 {-# INLINE walk #-}
 
+runM1 :: Foldable1 f => f a -> M1 a b -> b
+runM1 p (M1 k h (m :: m -> m -> m)) = reify m $ \ (_ :: Proxy s) -> k $ runS (foldMap1 (S #. h) p :: S m s)
+
 instance Closed M1 where
   closed (M1 k h m) = M1 (\f x -> k (f x)) (fmap h) (liftA2 m)
+
+instance Distributive (M1 a) where
+  distribute fm = M1 (\t -> let g = foldDeRef1 t in runM1 g <$> fm) Tip1 Bin1
+  {-# INLINE distribute #-}
+
+instance Cosieve M1 FreeSemigroup where
+  cosieve = flip runM1
+
+instance Profunctor.Corepresentable M1 where
+  type Corep M1 = FreeSemigroup
+  cotabulate f = M1 (f . foldDeRef1) Tip1 Bin1
+
+instance Functor.Representable (M1 a) where
+  type Rep (M1 a) = FreeSemigroup a
+  tabulate = cotabulate
+  index = cosieve
+
+instance Costrong M1 where
+  unfirst = unfirstCorep
+  unsecond = unsecondCorep
