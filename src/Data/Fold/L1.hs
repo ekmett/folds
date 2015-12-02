@@ -19,6 +19,7 @@ import Data.Functor.Rep as Functor
 import Data.List.NonEmpty as NonEmpty
 import Data.Pointed
 import Data.Profunctor
+import Data.Profunctor.Closed
 import Data.Profunctor.Rep as Profunctor
 import Data.Profunctor.Sieve
 import Data.Profunctor.Unsafe
@@ -178,3 +179,7 @@ instance Functor.Representable (L1 a) where
   type Rep (L1 a) = NonEmpty a
   tabulate = cotabulate
   index = cosieve
+
+instance Closed L1 where
+  closed (L1 k h z) = L1 (\f x -> k (f x)) (liftA2 h) (fmap z)
+

@@ -14,6 +14,7 @@ import Data.Fold.Internal
 import Data.Functor.Apply
 import Data.Pointed
 import Data.Profunctor
+import Data.Profunctor.Closed
 import Data.Profunctor.Unsafe
 import Data.Semigroupoid
 import Prelude hiding (id,(.))
@@ -151,3 +152,7 @@ walk xs0 (R1 k h z) = k (go xs0) where
   go (Last a) = z a
   go (Cons1 a as) = h a (go as)
 {-# INLINE walk #-}
+
+instance Closed R1 where
+  closed (R1 k h z) = R1 (\f x -> k (f x)) (liftA2 h) (fmap z)
+
