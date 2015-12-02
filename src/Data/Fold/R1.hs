@@ -1,4 +1,6 @@
 {-# LANGUAGE Trustworthy #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ExistentialQuantification #-}
 module Data.Fold.R1
   ( R1(..)
@@ -9,12 +11,17 @@ import Control.Arrow
 import Control.Category
 import Control.Lens
 import Control.Monad.Zip
+import Data.Distributive
 import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Functor.Apply
+import Data.Functor.Rep as Functor
+import Data.List.NonEmpty as NonEmpty
 import Data.Pointed
 import Data.Profunctor
 import Data.Profunctor.Closed
+import Data.Profunctor.Rep as Profunctor
+import Data.Profunctor.Sieve
 import Data.Profunctor.Unsafe
 import Data.Semigroupoid
 import Prelude hiding (id,(.))
@@ -156,3 +163,27 @@ walk xs0 (R1 k h z) = k (go xs0) where
 instance Closed R1 where
   closed (R1 k h z) = R1 (\f x -> k (f x)) (liftA2 h) (fmap z)
 
+instance Cosieve R1 NonEmpty where
+  cosieve (R1 k h z) l = k (cata h z l)
+
+cata :: (a -> c -> c) -> (a -> c) -> NonEmpty a -> c
+cata f0 z0 (a0 :| as0) = go f0 z0 a0 as0 where
+  go f z a [] = z a
+  go f z a (b:bs) = f a (go f z b bs)
+
+instance Costrong R1 where
+  unfirst = unfirstCorep
+  unsecond = unsecondCorep
+
+instance Profunctor.Corepresentable R1 where
+  type Corep R1 = NonEmpty
+  cotabulate f = R1 (f . NonEmpty.fromList . Prelude.reverse) (:) pure
+  {-# INLINE cotabulate #-}
+
+instance Distributive (R1 a) where
+  distribute = distributeRep
+
+instance Functor.Representable (R1 a) where
+  type Rep (R1 a) = NonEmpty a
+  tabulate = cotabulate
+  index = cosieve
