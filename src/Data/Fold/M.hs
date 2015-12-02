@@ -16,6 +16,7 @@ import Control.Applicative
 import Control.Comonad
 import Control.Lens
 import Control.Monad.Zip
+import Data.Distributive
 import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Foldable hiding (sum, product)
@@ -137,6 +138,7 @@ instance Monad (M a) where
   return = pure
   {-# INLINE return #-}
 
+  -- TODO: exploit observable sharing?
   m >>= f = M (\xs a -> run xs (f a)) One Two Zero <*> m
   {-# INLINE (>>=) #-}
 
@@ -173,3 +175,7 @@ instance ComonadApply (M a) where
 
   _ @> m = m
   {-# INLINE (@>) #-}
+
+instance Distributive (M a) where
+  distribute fm = M (\t -> let g = foldDeRef t in run g <$> fm) One Two Zero
+  {-# INLINE distribute #-}

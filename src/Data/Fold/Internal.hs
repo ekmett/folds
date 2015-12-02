@@ -1,8 +1,14 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Fold.Internal
   ( SnocList(..)
   , SnocList1(..)
@@ -14,21 +20,31 @@ module Data.Fold.Internal
   , Tree1(..)
   , An(..)
   , Box(..)
+  , foldDeRef
+  , FoldMap(..)
   ) where
 
 #if __GLASGOW_HASKELL__ < 710
 import Control.Applicative
 #endif
+import Control.Monad.Fix
+import Data.Bifunctor
+import Data.Bifoldable
+import Data.Bitraversable
+import Data.Constraint
 import Data.Data (Data, Typeable)
 #if __GLASGOW_HASKELL__ < 710
 import Data.Foldable
 import Data.Monoid hiding (First, Last)
 #endif
+import Data.HashMap.Lazy as HM
 import Data.Proxy (Proxy(Proxy))
 import Data.Reflection
+import Data.Reify
 #if __GLASGOW_HASKELL__ < 710
 import Data.Traversable
 #endif
+import System.IO.Unsafe
 
 -- | Reversed '[]'
 data SnocList a = Snoc (SnocList a) a | Nil
@@ -79,8 +95,6 @@ instance Traversable SnocList1 where
   traverse f (First a) = First <$> f a
   {-# INLINABLE traverse #-}
 
-
-
 -- | Strict 'Maybe'
 data Maybe' a = Nothing' | Just' !a
   deriving (Eq,Ord,Show,Read,Typeable,Data)
@@ -125,6 +139,7 @@ instance Traversable Tree where
   traverse _ Zero = pure Zero
   traverse f (One a) = One <$> f a
   traverse f (Two a b) = Two <$> traverse f a <*> traverse f b
+
 
 -- | Strict Pair
 data Pair' a b = Pair' !a !b deriving (Eq,Ord,Show,Read,Typeable,Data)
@@ -197,3 +212,44 @@ instance Foldable Tree1 where
 instance Traversable Tree1 where
   traverse f (Bin1 as bs) = Bin1 <$> traverse f as <*> traverse f bs
   traverse f (Tip1 a) = Tip1 <$> f a
+
+newtype FoldMap a = FoldMap { runFoldMap :: forall m. Monoid m => (a -> m) -> m }
+
+instance Foldable FoldMap where
+  foldMap f m = runFoldMap m f
+
+data T a b = T0 | T1 a | T2 b b deriving (Functor, Foldable, Traversable)
+
+instance MuRef (Tree a) where
+  type DeRef (Tree a) = T a
+  mapDeRef _ Zero    = pure T0
+  mapDeRef _ (One a) = pure (T1 a)
+  mapDeRef f (Two x y) = T2 <$> f x <*> f y
+
+class MuRef1 (f :: * -> *) where
+  type DeRef1 f :: * -> * -> *
+  muRef1 :: proxy (f a) -> Dict (MuRef (f a), DeRef (f a) ~ DeRef1 f a)
+
+foldDeRef :: forall f a. (MuRef1 f, Bifoldable (DeRef1 f)) => f a -> FoldMap a
+foldDeRef m = case muRef1 (undefined :: Proxy (f a)) of
+  Dict -> case unsafePerformIO (reifyGraph m) of
+    Graph xs i | hm <- HM.fromList xs -> FoldMap $ \ f -> fix (\mm -> fmap (bifoldMap f (mm !)) hm) ! i
+
+instance MuRef1 Tree where
+  type DeRef1 Tree = T
+  muRef1 _ = Dict
+
+instance Bifunctor T where
+  bimap _ _ T0 = T0
+  bimap f _ (T1 a) = T1 (f a)
+  bimap _ g (T2 b c) = T2 (g b) (g c)
+
+instance Bifoldable T where
+  bifoldMap _ _ T0 = mempty
+  bifoldMap f _ (T1 a) = f a
+  bifoldMap _ g (T2 b c) = g b `mappend` g c
+
+instance Bitraversable T where
+  bitraverse _ _ T0 = pure T0
+  bitraverse f _ (T1 a) = T1 <$> f a
+  bitraverse _ g (T2 b c) = T2 <$> g b <*> g c
