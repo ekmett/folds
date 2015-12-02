@@ -14,6 +14,7 @@ import Data.Fold.Internal
 import Data.Functor.Apply
 import Data.Pointed
 import Data.Profunctor
+import Data.Profunctor.Closed
 import Data.Profunctor.Unsafe
 import Data.Semigroupoid
 import Prelude hiding (id,(.))
@@ -154,3 +155,6 @@ walk xs0 (M1 k h m) = k (go xs0) where
   go (Tip1 a) = h a
   go (Bin1 xs ys) = m (go xs) (go ys)
 {-# INLINE walk #-}
+
+instance Closed M1 where
+  closed (M1 k h m) = M1 (\f x -> k (f x)) (fmap h) (liftA2 m)
