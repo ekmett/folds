@@ -168,7 +168,7 @@ instance Cosieve R1 NonEmpty where
 
 cata :: (a -> c -> c) -> (a -> c) -> NonEmpty a -> c
 cata f0 z0 (a0 :| as0) = go f0 z0 a0 as0 where
-  go f z a [] = z a
+  go _ z a [] = z a
   go f z a (b:bs) = f a (go f z b bs)
 
 instance Costrong R1 where
