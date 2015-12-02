@@ -23,6 +23,7 @@ import Data.Functor.Extend
 import Data.Functor.Bind
 import Data.Functor.Rep as Functor
 import Data.Profunctor
+import Data.Profunctor.Closed
 import Data.Profunctor.Sieve
 import Data.Profunctor.Rep as Profunctor
 import Data.Profunctor.Unsafe
@@ -195,6 +196,9 @@ instance Cosieve L [] where
     go k _ z [] = k z
     go k h z (a:as) = go k h (h z a) as
   {-# INLINE cosieve #-}
+
+instance Closed L where
+  closed (L k h z) = L (\f x -> k (f x)) (liftA2 h) (pure z)
 
 instance Profunctor.Corepresentable L where
   type Corep L = []
