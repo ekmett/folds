@@ -4,6 +4,7 @@
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE PatternGuards #-}
 {-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE DeriveDataTypeable #-}
@@ -21,7 +22,7 @@ module Data.Fold.Internal
   , An(..)
   , Box(..)
   , foldDeRef
-  , FoldMap(..)
+  , Free(..)
   ) where
 
 #if __GLASGOW_HASKELL__ < 710
@@ -213,12 +214,11 @@ instance Traversable Tree1 where
   traverse f (Bin1 as bs) = Bin1 <$> traverse f as <*> traverse f bs
   traverse f (Tip1 a) = Tip1 <$> f a
 
-newtype FoldMap a = FoldMap { runFoldMap :: forall m. Monoid m => (a -> m) -> m }
+newtype Free p a = Free { runFree :: forall m. p m => (a -> m) -> m }
   deriving Functor
 
-instance Foldable FoldMap where
-  foldMap f m = runFoldMap m f
-
+instance p ~ Monoid => Foldable (Free p) where
+  foldMap f m = runFree m f
 
 data T a b = T0 | T1 a | T2 b b deriving (Functor, Foldable, Traversable)
 
@@ -232,10 +232,10 @@ class MuRef1 (f :: * -> *) where
   type DeRef1 f :: * -> * -> *
   muRef1 :: proxy (f a) -> Dict (MuRef (f a), DeRef (f a) ~ DeRef1 f a)
 
-foldDeRef :: forall f a. (MuRef1 f, Bifoldable (DeRef1 f)) => f a -> FoldMap a
+foldDeRef :: forall f a. (MuRef1 f, Bifoldable (DeRef1 f)) => f a -> Free Monoid a
 foldDeRef m = case muRef1 (undefined :: Proxy (f a)) of
   Dict -> case unsafePerformIO (reifyGraph m) of
-    Graph xs i | hm <- HM.fromList xs -> FoldMap $ \ f -> fix (\mm -> fmap (bifoldMap f (mm !)) hm) ! i
+    Graph xs i | hm <- HM.fromList xs -> Free $ \ f -> fix (\mm -> fmap (bifoldMap f (mm !)) hm) ! i
 
 instance MuRef1 Tree where
   type DeRef1 Tree = T

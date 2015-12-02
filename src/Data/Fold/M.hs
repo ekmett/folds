@@ -1,10 +1,11 @@
-{-# LANGUAGE Trustworthy #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE Trustworthy #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ExistentialQuantification #-}
 -- |
 -- Unlike 'Data.Fold.L' and 'Data.Fold.R' this 'Comonad'
@@ -190,15 +191,15 @@ instance Distributive (M a) where
 instance Closed M where
   closed (M k h m z) = M (\f x -> k (f x)) (fmap h) (liftA2 m) (pure z)
 
-instance Cosieve M FoldMap where
+instance Cosieve M (Free Monoid) where
   cosieve = flip run
 
 instance Profunctor.Corepresentable M where
-  type Corep M = FoldMap
+  type Corep M = Free Monoid
   cotabulate f = M (f . foldDeRef) One Two Zero
 
 instance Functor.Representable (M a) where
-  type Rep (M a) = FoldMap a
+  type Rep (M a) = Free Monoid a
   tabulate = cotabulate
   index = cosieve
 
