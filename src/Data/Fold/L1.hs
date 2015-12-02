@@ -1,6 +1,7 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE Trustworthy #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeFamilies #-}
 module Data.Fold.L1
   ( L1(..)
   ) where
@@ -10,12 +11,15 @@ import Control.Arrow
 import Control.Category
 import Control.Lens
 import Control.Monad.Zip
+import Data.Distributive
 import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Functor.Apply
-import Data.List.NonEmpty
+import Data.Functor.Rep as Functor
+import Data.List.NonEmpty as NonEmpty
 import Data.Pointed
 import Data.Profunctor
+import Data.Profunctor.Rep as Profunctor
 import Data.Profunctor.Sieve
 import Data.Profunctor.Unsafe
 import Data.Semigroupoid
@@ -157,3 +161,20 @@ walk xs0 (L1 k h z) = k (go xs0) where
 
 instance Cosieve L1 NonEmpty where
   cosieve (L1 k h z) (a :| as) = k (foldl h (z a) as) where
+
+instance Costrong L1 where
+  unfirst = unfirstCorep
+  unsecond = unsecondCorep
+
+instance Profunctor.Corepresentable L1 where
+  type Corep L1 = NonEmpty
+  cotabulate f = L1 (f . NonEmpty.fromList . Prelude.reverse) (flip (:)) pure
+  {-# INLINE cotabulate #-}
+
+instance Distributive (L1 a) where
+  distribute = distributeRep
+
+instance Functor.Representable (L1 a) where
+  type Rep (L1 a) = NonEmpty a
+  tabulate = cotabulate
+  index = cosieve
