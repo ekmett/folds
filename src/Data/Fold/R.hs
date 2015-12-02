@@ -190,4 +190,3 @@ instance Cosieve R [] where
 
 instance Closed R where
   closed (R k h z) = R (\f x -> k (f x)) (liftA2 h) (pure z)
-
