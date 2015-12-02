@@ -2,6 +2,8 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE ExistentialQuantification #-}
 -- |
@@ -20,9 +22,13 @@ import Data.Distributive
 import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Foldable hiding (sum, product)
-import Data.Functor.Extend
 import Data.Functor.Bind
+import Data.Functor.Extend
+import Data.Functor.Rep as Functor
+import Data.Profunctor
 import Data.Profunctor.Closed
+import Data.Profunctor.Rep as Profunctor
+import Data.Profunctor.Sieve
 import Data.Profunctor.Unsafe
 import Data.Proxy
 import Data.Reflection
@@ -183,3 +189,19 @@ instance Distributive (M a) where
 
 instance Closed M where
   closed (M k h m z) = M (\f x -> k (f x)) (fmap h) (liftA2 m) (pure z)
+
+instance Cosieve M FoldMap where
+  cosieve = flip run
+
+instance Profunctor.Corepresentable M where
+  type Corep M = FoldMap
+  cotabulate f = M (f . foldDeRef) One Two Zero
+
+instance Functor.Representable (M a) where
+  type Rep (M a) = FoldMap a
+  tabulate = cotabulate
+  index = cosieve
+
+instance Costrong M where
+  unfirst = unfirstCorep
+  unsecond = unsecondCorep

@@ -214,9 +214,11 @@ instance Traversable Tree1 where
   traverse f (Tip1 a) = Tip1 <$> f a
 
 newtype FoldMap a = FoldMap { runFoldMap :: forall m. Monoid m => (a -> m) -> m }
+  deriving Functor
 
 instance Foldable FoldMap where
   foldMap f m = runFoldMap m f
+
 
 data T a b = T0 | T1 a | T2 b b deriving (Functor, Foldable, Traversable)
 
