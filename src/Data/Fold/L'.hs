@@ -23,6 +23,7 @@ import Data.Functor.Extend
 import Data.Functor.Bind
 import Data.Functor.Rep as Functor
 import Data.Profunctor
+import Data.Profunctor.Closed
 import Data.Profunctor.Rep as Profunctor
 import Data.Profunctor.Sieve
 import Data.Profunctor.Unsafe
@@ -184,6 +185,9 @@ instance Functor.Representable (L' a) where
 instance Costrong L' where
   unfirst = unfirstCorep
   unsecond = unsecondCorep
+
+instance Closed L' where
+  closed (L' k h z) = L' (\f x -> k (f x)) (liftA2 h) (pure z)
 
 instance Profunctor.Corepresentable L' where
   type Corep L' = []

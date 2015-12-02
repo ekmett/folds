@@ -22,6 +22,7 @@ import Data.Fold.Internal
 import Data.Foldable hiding (sum, product)
 import Data.Functor.Extend
 import Data.Functor.Bind
+import Data.Profunctor.Closed
 import Data.Profunctor.Unsafe
 import Data.Proxy
 import Data.Reflection
@@ -179,3 +180,6 @@ instance ComonadApply (M a) where
 instance Distributive (M a) where
   distribute fm = M (\t -> let g = foldDeRef t in run g <$> fm) One Two Zero
   {-# INLINE distribute #-}
+
+instance Closed M where
+  closed (M k h m z) = M (\f x -> k (f x)) (fmap h) (liftA2 m) (pure z)
