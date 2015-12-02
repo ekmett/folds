@@ -1,6 +1,6 @@
-0.6.4
+0.7
 -----
-* `L` and `L'` are representable functors.
+* Folds are closed, corepresentable profunctors. This observation supplies us with many additional useful instances.
 
 0.6.3
 -------
