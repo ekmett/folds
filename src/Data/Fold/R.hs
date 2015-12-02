@@ -4,6 +4,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 module Data.Fold.R
   ( R(..)
   ) where
@@ -12,11 +14,16 @@ import Control.Applicative
 import Control.Comonad
 import Control.Lens
 import Control.Monad.Zip
+import Data.Distributive
 import Data.Foldable hiding (sum, product)
 import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Functor.Extend
 import Data.Functor.Bind
+import Data.Functor.Rep as Functor
+import Data.Profunctor
+import Data.Profunctor.Rep as Profunctor
+import Data.Profunctor.Sieve
 import Data.Profunctor.Unsafe
 import Unsafe.Coerce
 import Prelude hiding (foldr, sum, product, length)
@@ -155,3 +162,27 @@ instance ComonadApply (R a) where
 
   _ @> m = m
   {-# INLINE (@>) #-}
+
+instance Distributive (R a) where
+  distribute = R (fmap extract) (fmap . prefix1)
+  {-# INLINE distribute #-}
+
+instance Functor.Representable (R a) where
+  type Rep (R a) = [a]
+  index = cosieve
+  tabulate = cotabulate
+
+instance Costrong R where
+  unfirst = unfirstCorep
+  unsecond = unsecondCorep
+
+instance Profunctor.Corepresentable R where
+  type Corep R = []
+  cotabulate f = R (f . reverse) (:) []
+  {-# INLINE cotabulate #-}
+
+instance Cosieve R [] where
+  cosieve (R k0 h0 z0) as0 = go k0 h0 z0 as0 where
+    go k _ z [] = k z
+    go k h z (a:as) = go k h (h a z) as
+  {-# INLINE cosieve #-}
