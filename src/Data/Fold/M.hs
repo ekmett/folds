@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE Trustworthy #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -25,6 +26,9 @@ import Data.Foldable hiding (sum, product)
 import Data.Functor.Bind
 import Data.Functor.Extend
 import Data.Functor.Rep as Functor
+#if __GLASGOW_HASKELL__ < 710
+import Data.Monoid
+#endif
 import Data.Profunctor
 import Data.Profunctor.Closed
 import Data.Profunctor.Rep as Profunctor
