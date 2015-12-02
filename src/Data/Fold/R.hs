@@ -13,6 +13,7 @@ module Data.Fold.R
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
+import Control.Monad.Reader.Class
 import Control.Monad.Zip
 import Data.Distributive
 import Data.Foldable hiding (sum, product)
@@ -187,6 +188,10 @@ instance Cosieve R [] where
     go k _ z [] = k z
     go k h z (a:as) = go k h (h a z) as
   {-# INLINE cosieve #-}
+
+instance MonadReader [a] (R a) where
+  ask = askRep
+  local = localRep
 
 instance Closed R where
   closed (R k h z) = R (\f x -> k (f x)) (liftA2 h) (pure z)

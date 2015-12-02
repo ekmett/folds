@@ -12,6 +12,7 @@ import Control.Applicative
 import Control.Arrow
 import Control.Category
 import Control.Lens
+import Control.Monad.Reader.Class
 import Control.Monad.Zip
 import Data.Distributive
 import Data.Fold.Class
@@ -192,3 +193,7 @@ instance Functor.Representable (M1 a) where
 instance Costrong M1 where
   unfirst = unfirstCorep
   unsecond = unsecondCorep
+
+instance MonadReader (FreeSemigroup a) (M1 a) where
+  ask = askRep
+  local = localRep

@@ -9,6 +9,7 @@ module Data.Fold.L1'
 import Control.Applicative
 import Control.Arrow
 import Control.Category
+import Control.Monad.Reader.Class
 import Control.Lens
 import Data.Distributive
 import Data.Fold.Class
@@ -178,3 +179,6 @@ instance Functor.Representable (L1' a) where
 instance Closed L1' where
   closed (L1' k h z) = L1' (\f x -> k (f x)) (liftA2 h) (fmap z)
 
+instance MonadReader (NonEmpty a) (L1' a) where
+  ask = askRep
+  local = localRep

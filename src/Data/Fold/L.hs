@@ -14,6 +14,7 @@ module Data.Fold.L
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
+import Control.Monad.Reader.Class
 import Control.Monad.Zip
 import Data.Distributive
 import Data.Foldable
@@ -186,6 +187,10 @@ instance Functor.Representable (L a) where
   type Rep (L a) = [a]
   index = cosieve
   tabulate = cotabulate
+
+instance MonadReader [a] (L a) where
+  ask = askRep
+  local = localRep
 
 instance Costrong L where
   unfirst = unfirstCorep

@@ -18,6 +18,7 @@ module Data.Fold.M
 import Control.Applicative
 import Control.Comonad
 import Control.Lens
+import Control.Monad.Reader.Class
 import Control.Monad.Zip
 import Data.Distributive
 import Data.Fold.Class
@@ -197,6 +198,10 @@ instance Cosieve M FreeMonoid where
 instance Profunctor.Corepresentable M where
   type Corep M = FreeMonoid
   cotabulate f = M (f . foldDeRef) One Two Zero
+
+instance MonadReader (FreeMonoid a) (M a) where
+  ask = askRep
+  local = localRep
 
 instance Functor.Representable (M a) where
   type Rep (M a) = FreeMonoid a

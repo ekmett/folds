@@ -10,6 +10,7 @@ import Control.Applicative
 import Control.Arrow
 import Control.Category
 import Control.Lens
+import Control.Monad.Reader.Class
 import Control.Monad.Zip
 import Data.Distributive
 import Data.Fold.Class
@@ -187,3 +188,7 @@ instance Functor.Representable (R1 a) where
   type Rep (R1 a) = NonEmpty a
   tabulate = cotabulate
   index = cosieve
+
+instance MonadReader (NonEmpty a) (R1 a) where
+  ask = askRep
+  local = localRep
