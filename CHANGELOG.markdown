@@ -1,3 +1,11 @@
+0.7.1
+-----
+* Support `pointed` 5
+* Support `transformers` 0.5
+* Support `comonad` 5
+* Support GHC 8
+* Cleaned up the new warnings caused by `profunctors` 5.2
+
 0.7
 -----
 * Folds are closed, corepresentable profunctors. This observation supplies us with many additional useful instances.

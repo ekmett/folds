@@ -24,8 +24,8 @@ import Data.Fold.Internal
 import Data.Functor.Extend
 import Data.Functor.Bind
 import Data.Functor.Rep as Functor
-import Data.Profunctor
 import Data.Profunctor.Closed
+import Data.Profunctor
 import Data.Profunctor.Sieve
 import Data.Profunctor.Rep as Profunctor
 import Data.Profunctor.Unsafe
@@ -196,6 +196,9 @@ instance MonadReader [a] (L a) where
 instance Costrong L where
   unfirst = unfirstCorep
   unsecond = unsecondCorep
+
+-- | >>> cosieve (L id (+) 0) [1,2,3]
+-- 6
 
 instance Cosieve L [] where
   cosieve (L k0 h0 z0) as0 = go k0 h0 z0 as0 where

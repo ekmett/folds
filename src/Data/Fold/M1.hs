@@ -21,8 +21,8 @@ import Data.Fold.Internal
 import Data.Functor.Apply
 import Data.Functor.Rep as Functor
 import Data.Pointed
-import Data.Profunctor
 import Data.Profunctor.Closed
+import Data.Profunctor
 import Data.Profunctor.Sieve
 import Data.Profunctor.Rep as Profunctor
 import Data.Profunctor.Unsafe
