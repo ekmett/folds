@@ -110,13 +110,13 @@ instance Bind (R a) where
   {-# INLINE (>>-) #-}
 
 instance Monad (R a) where
-  return b = R (\() -> b) (\_ () -> ()) ()
+  return = pure
   {-# INLINE return #-}
 
   m >>= f = R (\xs a -> run xs (f a)) (:) [] <*> m
   {-# INLINE (>>=) #-}
 
-  _ >> n = n
+  (>>) = (*>)
   {-# INLINE (>>) #-}
 
 instance MonadZip (R a) where

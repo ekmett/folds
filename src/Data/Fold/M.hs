@@ -152,7 +152,7 @@ instance Monad (M a) where
   m >>= f = M (\xs a -> run xs (f a)) One Two Zero <*> m
   {-# INLINE (>>=) #-}
 
-  _ >> n = n
+  (>>) = (*>)
   {-# INLINE (>>) #-}
 
 instance MonadZip (M a) where

@@ -73,11 +73,11 @@ instance Applicative (R1 a) where
   {-# INLINE (*>) #-}
 
 instance Monad (R1 a) where
-  return x = R1 (\() -> x) (\_ () -> ()) (\_ -> ())
+  return = pure
   {-# INLINE return #-}
   m >>= f = R1 (\xs a -> walk xs (f a)) Cons1 Last <*> m
   {-# INLINE (>>=) #-}
-  _ >> n = n
+  (>>) = (*>)
   {-# INLINE (>>) #-}
 
 instance MonadZip (R1 a) where

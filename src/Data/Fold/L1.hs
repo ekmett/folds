@@ -73,11 +73,11 @@ instance Applicative (L1 a) where
   {-# INLINE (*>) #-}
 
 instance Monad (L1 a) where
-  return x = L1 (\() -> x) (\() _ -> ()) (\_ -> ())
+  return = pure
   {-# INLINE return #-}
   m >>= f = L1 (\xs a -> walk xs (f a)) Snoc1 First <*> m
   {-# INLINE (>>=) #-}
-  _ >> n = n
+  (>>) = (*>)
   {-# INLINE (>>) #-}
 
 instance MonadZip (L1 a) where
