@@ -122,10 +122,14 @@ maybe' z _ Nothing'  = z
 newtype N a s = N { runN :: a }
   deriving (Eq,Ord,Show,Read,Typeable,Data)
 
+instance Reifies s (a -> a -> a, a) => Semigroup (N a s) where
+  N a <> N b = N $ fst (reflect (Proxy :: Proxy s)) a b
+  {-# INLINE (<>) #-}
+
 instance Reifies s (a -> a -> a, a) => Monoid (N a s) where
   mempty = N $ snd $ reflect (Proxy :: Proxy s)
   {-# INLINE mempty #-}
-  mappend (N a) (N b) = N $ fst (reflect (Proxy :: Proxy s)) a b
+  mappend = (<>)
   {-# INLINE mappend #-}
 
 -- | The shape of a 'foldMap'
@@ -160,9 +164,16 @@ instance Reifies s (a -> a -> a) => Semigroup (S a s) where
 -- | Strict Pair
 data Pair' a b = Pair' !a !b deriving (Eq,Ord,Show,Read,Typeable,Data)
 
+instance (Semigroup a, Semigroup b) => Semigroup (Pair' a b) where
+  Pair' a b <> Pair' c d = Pair' (a <> c) (b <> d)
+  {-# INLINE (<>) #-}
+
 instance (Monoid a, Monoid b) => Monoid (Pair' a b) where
   mempty = Pair' mempty mempty
   {-# INLINE mempty #-}
+
+  -- TODO/FIXME: Once Semigroup becomes a superclass
+  -- `#if MIN_VERSION_base`-out this definition
   mappend (Pair' a b) (Pair' c d) = Pair' (mappend a c) (mappend b d)
   {-# INLINE mappend #-}
 

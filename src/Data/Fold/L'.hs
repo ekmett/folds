@@ -139,7 +139,7 @@ instance Monad (L' a) where
   m >>= f = L' (\xs a -> run xs (f a)) Snoc Nil <*> m
   {-# INLINE (>>=) #-}
 
-  _ >> n = n
+  (>>) = (*>)
   {-# INLINE (>>) #-}
 
 instance MonadZip (L' a) where

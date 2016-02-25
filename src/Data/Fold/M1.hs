@@ -80,11 +80,11 @@ instance Applicative (M1 a) where
   {-# INLINE (*>) #-}
 
 instance Monad (M1 a) where
-  return x = M1 (\() -> x) (\_ -> ()) (\() () -> ())
+  return = pure
   {-# INLINE return #-}
   m >>= f = M1 (\xs a -> walk xs (f a)) Tip1 Bin1 <*> m
   {-# INLINE (>>=) #-}
-  _ >> n = n
+  (>>) = (*>)
   {-# INLINE (>>) #-}
 
 instance MonadZip (M1 a) where
