@@ -112,16 +112,14 @@ instance Comonad (L' a) where
   extend f (L' k h z)  = L' (f . L' k h) h z
   {-# INLINE extend #-}
 
-data Pair a b = Pair !a !b
-
 instance Applicative (L' a) where
   pure b = L' (\() -> b) (\() _ -> ()) ()
   {-# INLINE pure #-}
 
   L' xf bxx xz <*> L' ya byy yz = L'
-    (\(Pair x y) -> xf x $ ya y)
-    (\(Pair x y) b -> Pair (bxx x b) (byy y b))
-    (Pair xz yz)
+    (\(Pair' x y) -> xf x $ ya y)
+    (\(Pair' x y) b -> Pair' (bxx x b) (byy y b))
+    (Pair' xz yz)
   {-# INLINE (<*>) #-}
 
   (<*) m = \_ -> m
