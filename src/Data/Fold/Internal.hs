@@ -173,7 +173,7 @@ instance (Monoid a, Monoid b) => Monoid (Pair' a b) where
   {-# INLINE mempty #-}
 
   -- TODO/FIXME: Once Semigroup becomes a superclass
-  -- `#if MIN_VERSION_base(...)`-out this definition
+  -- `#if MIN_VERSION_base`-out this definition
   mappend (Pair' a b) (Pair' c d) = Pair' (mappend a c) (mappend b d)
   {-# INLINE mappend #-}
 
