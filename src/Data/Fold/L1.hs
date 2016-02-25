@@ -163,7 +163,7 @@ walk xs0 (L1 k h z) = k (go xs0) where
 {-# INLINE walk #-}
 
 instance Cosieve L1 NonEmpty where
-  cosieve (L1 k h z) (a :| as) = k (foldl h (z a) as) where
+  cosieve (L1 k h z) (a :| as) = k (foldl h (z a) as)
 
 instance Costrong L1 where
   unfirst = unfirstCorep
