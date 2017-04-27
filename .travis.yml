@@ -52,8 +52,8 @@ before_install:
        chmod a+x ~/bin/stack;
        scripts/travis_long stack --no-terminal setup;;
      cabal)
-       export HAPPYVER=1.19.5
-       export ALEXVER=3.1.4
+       export HAPPYVER=1.19.5;
+       export ALEXVER=3.1.4;
        export PATH=~/.cabal/bin:/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:/opt/happy/$HAPPYVER/bin:/opt/alex/$ALEXVER/bin:$PATH;;
    esac
 install:
