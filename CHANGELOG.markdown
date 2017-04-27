@@ -1,3 +1,7 @@
+next
+----
+* Ensure that `HLint.hs` is shipped with the library
+
 0.7.2
 -----
 * Revamp `Setup.hs` to use `cabal-doctest`. This makes it build

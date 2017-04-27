@@ -19,6 +19,7 @@ extra-source-files:
   .gitignore
   .vim.custom
   CHANGELOG.markdown
+  HLint.hs
   README.markdown
 
 description: This package is a playground full of comonadic folds.
