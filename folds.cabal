@@ -29,6 +29,12 @@ description: This package is a playground full of comonadic folds.
   .
   More information on this approach can be found in the <http://conal.net/blog/posts/another-lovely-example-of-type-class-morphisms "Another lovely example of type class morphisms"> and <http://conal.net/blog/posts/more-beautiful-fold-zipping "More beautiful fold zipping"> posts by Conal Elliott, as well as in Gabriel Gonzales' <http://www.haskellforall.com/2013/08/composable-streaming-folds.html "Composable Streaming Folds">
 
+custom-setup
+  setup-depends:
+    base          >= 4.3 && <5,
+    Cabal         >= 1.10,
+    cabal-doctest >= 1 && <1.1
+
 source-repository head
   type: git
   location: git://github.com/ekmett/folds.git
