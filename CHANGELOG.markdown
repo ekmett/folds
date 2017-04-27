@@ -1,5 +1,5 @@
-next
-----
+0.7.3
+-----
 * Ensure that `HLint.hs` is shipped with the library
 
 0.7.2
