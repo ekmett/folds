@@ -131,5 +131,6 @@ test-suite doctests
       deepseq,
       doctest        >= 0.9.1,
       filepath,
+      folds,
       mtl,
       semigroups     >= 0.9

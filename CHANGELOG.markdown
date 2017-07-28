@@ -1,3 +1,7 @@
+next
+----
+* Add a library dependency on the `doctests` test suite
+
 0.7.3
 -----
 * Ensure that `HLint.hs` is shipped with the library
