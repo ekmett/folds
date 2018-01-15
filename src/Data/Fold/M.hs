@@ -24,7 +24,7 @@ import Control.Monad.Zip
 import Data.Distributive
 import Data.Fold.Class
 import Data.Fold.Internal
-import Data.Foldable hiding (sum, product)
+import Data.Foldable
 import Data.Functor.Bind
 import Data.Functor.Extend
 import Data.Functor.Rep as Functor
@@ -36,7 +36,7 @@ import Data.Profunctor.Unsafe
 import Data.Proxy
 import Data.Reflection
 import Unsafe.Coerce
-import Prelude hiding (sum, product, length)
+import Prelude
 
 -- | A 'foldMap' caught in amber. a.k.a. a monoidal reducer
 data M a b = forall m. M (m -> b) (a -> m) (m -> m -> m) m

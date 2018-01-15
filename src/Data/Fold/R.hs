@@ -17,7 +17,7 @@ import Control.Monad.Fix
 import Control.Monad.Reader.Class
 import Control.Monad.Zip
 import Data.Distributive
-import Data.Foldable hiding (sum, product)
+import Data.Foldable
 import Data.Fold.Class
 import Data.Fold.Internal
 import Data.Functor.Extend
@@ -29,7 +29,7 @@ import Data.Profunctor.Rep as Profunctor
 import Data.Profunctor.Sieve
 import Data.Profunctor.Unsafe
 import Unsafe.Coerce
-import Prelude hiding (foldr, sum, product, length)
+import Prelude hiding (foldr)
 
 -- | right folds / a reversed Moore machine
 data R a b = forall r. R (r -> b) (a -> r -> r) r

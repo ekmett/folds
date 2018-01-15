@@ -30,7 +30,7 @@ import Data.Profunctor.Rep as Profunctor
 import Data.Profunctor.Sieve
 import Data.Profunctor.Unsafe
 import Unsafe.Coerce
-import Prelude hiding (foldl)
+import Prelude
 
 -- | A strict left fold / strict Moore machine
 data L' a b = forall r. L' (r -> b) (r -> a -> r) r
