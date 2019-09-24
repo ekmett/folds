@@ -25,9 +25,9 @@ tested-with:   GHC == 7.4.2
 extra-source-files:
   .travis.yml
   .gitignore
+  .hlint.yaml
   .vim.custom
   CHANGELOG.markdown
-  HLint.hs
   README.markdown
   Warning.hs
 
