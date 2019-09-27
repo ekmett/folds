@@ -1,5 +1,5 @@
-next [????.??.??]
------------------
+0.7.5 [2019.09.27]
+------------------
 * Remove the `hlint` test suite in favor of running `hlint` directly on CI.
 
 0.7.4
