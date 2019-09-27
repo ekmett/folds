@@ -1,3 +1,7 @@
+next [????.??.??]
+-----------------
+* Remove the `hlint` test suite in favor of running `hlint` directly on CI.
+
 0.7.4
 -----
 * Add a library dependency on the `doctests` test suite
