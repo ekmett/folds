@@ -8,3 +8,7 @@
 - ignore: {name: Avoid lambda}
 - ignore: {name: Use newtype instead of data}
 - ignore: {name: Avoid lambda using `infix`}
+- ignore: {name: Unused LANGUAGE pragma, within: [Data.Fold.Internal]}
+  # Prior to GHC 7.10, DeriveTraversable didn't imply DeriveFunctor/DeriveFoldable.
+  # Silence hlint's warning about DeriveTraversable implying them to avoid having
+  # to fix the issue with CPP.
