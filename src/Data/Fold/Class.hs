@@ -17,6 +17,7 @@ import Data.Profunctor.Unsafe
 
 --
 -- $setup
+-- >>> import Control.Lens
 -- >>> import Data.Fold
 
 class Choice p => Scan p where
