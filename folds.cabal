@@ -57,7 +57,7 @@ library
     contravariant     >= 0.4.2 && < 2,
     data-reify        >= 0.6   && < 0.7,
     distributive      >= 0.3   && < 1,
-    lens              >= 4     && < 5,
+    lens              >= 4     && < 6,
     mtl               >= 2.0.1 && < 2.3,
     pointed           >= 4     && < 6,
     profunctors       >= 5     && < 6,
