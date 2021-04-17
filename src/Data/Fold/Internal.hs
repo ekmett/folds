@@ -172,10 +172,10 @@ instance (Monoid a, Monoid b) => Monoid (Pair' a b) where
   mempty = Pair' mempty mempty
   {-# INLINE mempty #-}
 
-  -- TODO/FIXME: Once Semigroup becomes a superclass
-  -- `#if MIN_VERSION_base`-out this definition
+#if !(MIN_VERSION_base(4,11,0))
   mappend (Pair' a b) (Pair' c d) = Pair' (mappend a c) (mappend b d)
   {-# INLINE mappend #-}
+#endif
 
 newtype An a = An a deriving (Eq,Ord,Show,Read,Typeable,Data)
 
