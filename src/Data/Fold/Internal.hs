@@ -28,19 +28,14 @@ module Data.Fold.Internal
   , foldDeRef1
   ) where
 
-#if __GLASGOW_HASKELL__ < 710
-import Control.Applicative
-#endif
 import Control.Monad.Fix
 import Data.Bifunctor
 import Data.Bifoldable
 import Data.Bitraversable
 import Data.Constraint
-import Data.Data (Data, Typeable)
+import Data.Data (Data)
+import Data.Kind
 import Data.Semigroup hiding (Last, First)
-#if __GLASGOW_HASKELL__ < 710
-import Data.Foldable
-#endif
 import Data.Functor.Bind
 import Data.HashMap.Lazy as HM
 import Data.Profunctor.Unsafe
@@ -50,15 +45,11 @@ import Data.Reify
 import Data.Semigroup.Foldable
 import Data.Semigroup.Bifoldable
 import Data.Semigroup.Bitraversable
-
-#if __GLASGOW_HASKELL__ < 710
-import Data.Traversable
-#endif
 import System.IO.Unsafe
 
 -- | Reversed '[]'
 data SnocList a = Snoc (SnocList a) a | Nil
-  deriving (Eq,Ord,Show,Read,Typeable,Data)
+  deriving (Eq,Ord,Show,Read,Data)
 
 instance Functor SnocList where
   fmap f (Snoc xs x) = Snoc (fmap f xs) (f x)
@@ -80,7 +71,7 @@ instance Traversable SnocList where
   {-# INLINABLE traverse #-}
 
 data SnocList1 a = Snoc1 (SnocList1 a) a | First a
-  deriving (Eq,Ord,Show,Read,Typeable,Data)
+  deriving (Eq,Ord,Show,Read,Data)
 
 instance Functor SnocList1 where
   fmap f (Snoc1 xs x) = Snoc1 (fmap f xs) (f x)
@@ -107,7 +98,7 @@ instance Traversable SnocList1 where
 
 -- | Strict 'Maybe'
 data Maybe' a = Nothing' | Just' !a
-  deriving (Eq,Ord,Show,Read,Typeable,Data)
+  deriving (Eq,Ord,Show,Read,Data)
 
 instance Foldable Maybe' where
   foldMap _ Nothing' = mempty
@@ -120,7 +111,7 @@ maybe' z _ Nothing'  = z
 
 -- | A reified 'Monoid'.
 newtype N a s = N { runN :: a }
-  deriving (Eq,Ord,Show,Read,Typeable,Data)
+  deriving (Eq,Ord,Show,Read,Data)
 
 instance Reifies s (a -> a -> a, a) => Semigroup (N a s) where
   N a <> N b = N $ fst (reflect (Proxy :: Proxy s)) a b
@@ -137,7 +128,7 @@ data Tree a
   = Zero
   | One a
   | Two (Tree a) (Tree a)
-  deriving (Eq,Ord,Show,Read,Typeable,Data)
+  deriving (Eq,Ord,Show,Read,Data)
 
 instance Functor Tree where
   fmap _ Zero = Zero
@@ -156,13 +147,13 @@ instance Traversable Tree where
 
 -- | A reified 'Semigroup'.
 newtype S a s = S { runS :: a }
-  deriving (Eq,Ord,Show,Read,Typeable,Data)
+  deriving (Eq,Ord,Show,Read,Data)
 
 instance Reifies s (a -> a -> a) => Semigroup (S a s) where
   S a <> S b = S $ reflect (Proxy :: Proxy s) a b
 
 -- | Strict Pair
-data Pair' a b = Pair' !a !b deriving (Eq,Ord,Show,Read,Typeable,Data)
+data Pair' a b = Pair' !a !b deriving (Eq,Ord,Show,Read,Data)
 
 instance (Semigroup a, Semigroup b) => Semigroup (Pair' a b) where
   Pair' a b <> Pair' c d = Pair' (a <> c) (b <> d)
@@ -177,7 +168,7 @@ instance (Monoid a, Monoid b) => Monoid (Pair' a b) where
   {-# INLINE mappend #-}
 #endif
 
-newtype An a = An a deriving (Eq,Ord,Show,Read,Typeable,Data)
+newtype An a = An a deriving (Eq,Ord,Show,Read,Data)
 
 instance Functor An where
   fmap f (An a) = An (f a)
@@ -188,7 +179,7 @@ instance Foldable An where
 instance Traversable An where
   traverse f (An a) = An <$> f a
 
-data Box a = Box a deriving (Eq,Ord,Show,Read,Typeable,Data)
+data Box a = Box a deriving (Eq,Ord,Show,Read,Data)
 
 instance Functor Box where
   fmap f (Box a) = Box (f a)
@@ -261,8 +252,8 @@ instance MuRef (Tree a) where
   mapDeRef _ (One a) = pure (T1 a)
   mapDeRef f (Two x y) = T2 <$> f x <*> f y
 
-class MuRef1 (f :: * -> *) where
-  type DeRef1 f :: * -> * -> *
+class MuRef1 (f :: Type -> Type) where
+  type DeRef1 f :: Type -> Type -> Type
   muRef1 :: proxy (f a) -> Dict (MuRef (f a), DeRef (f a) ~ DeRef1 f a)
 
 foldDeRef :: forall f a. (MuRef1 f, Bifoldable (DeRef1 f)) => f a -> FreeMonoid a

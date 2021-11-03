@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE Trustworthy #-}
@@ -9,9 +8,6 @@ module Data.Fold.Class
   ) where
 
 import Control.Lens
-#if __GLASGOW_HASKELL__ < 710
-import Data.Foldable
-#endif
 import Data.Fold.Internal
 import Data.Profunctor.Unsafe
 
