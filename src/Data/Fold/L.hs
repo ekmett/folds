@@ -29,6 +29,7 @@ import Data.Profunctor
 import Data.Profunctor.Sieve
 import Data.Profunctor.Rep as Profunctor
 import Data.Profunctor.Unsafe
+import Data.Semigroupoid
 import Unsafe.Coerce
 import Prelude hiding (foldl)
 
@@ -152,6 +153,12 @@ instance Monad (L a) where
 instance MonadZip (L a) where
   mzipWith = liftA2
   {-# INLINE mzipWith #-}
+
+instance Semigroupoid L where
+  o (L k1 h1 z1) (L k2 h2 z2) = L (\(Pair' a _) -> k1 a) step (Pair' z1 z2)
+    where
+      step (Pair' x y) a = let y' = h2 y a in Pair' (h1 x (k2 y')) y'
+  {-# INLINE o #-}
 
 instance Extend (L a) where
   extended = extend
